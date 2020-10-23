@@ -1,12 +1,3 @@
-ESISAR PROJET 3A - EMULATION D'UN PROCESSEUR MIPS
-license fillot récursif. 
-
-L'objectif de ce projet est l'émulation d'un processeur MIPS en langage C. 
-L'émulateur a été dévelopé sous linux et pourra ne pas fonctionner en l'état sous windows.
-
-Pour éxécuter l'émulateur 
-
-
 # Projet MIPS ESISAR 2020
 
 Ce dépot est destiné au projet de 3A-Esisar "Émulation d'un processeur MIPS"
