@@ -1,5 +1,5 @@
 LANGAGE = C
-EXEC = Mips
+EXEC = emul-mips
 DEBUG = false
 CFLAGS = -Wall -ansi -pedantic -std=c99
 STATICDEFINE = 
