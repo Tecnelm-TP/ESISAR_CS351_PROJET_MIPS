@@ -1,8 +1,8 @@
 LANGAGE = C
-EXEC = exe
-DEBUG = yes
+EXEC = emul-mips
+DEBUG = false
 CFLAGS = -Wall -ansi -pedantic -std=c99
-STATICDEFINE = TEST
+STATICDEFINE = 
 lib = 
 
 OUT = out
@@ -60,7 +60,7 @@ $(OUT)/$(OBJDIR)/%.o: $(SRCDIR)/%.$(EXTP) $(HEADER)
 
 
 
-.PHONY: clean mrproper run create
+.PHONY: clean mrproper run create debug
 
 clean:
 	@rm -rf $(OUT)/$(OBJDIR)/*.o
@@ -75,4 +75,7 @@ create:
 	mkdir -p $(SRCDIR)
 	mkdir -p $(INCDIR)
 	mkdir -p $(LIBDIR)
+
+debug:
+	@make FLAGS="-g"
 

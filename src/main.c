@@ -1,7 +1,5 @@
-#include "parser.h"
-
 int main(int argc, char const *argv[])
 {
-    test();
+    /* code */
     return 0;
 }
