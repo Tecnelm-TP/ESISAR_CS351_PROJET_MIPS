@@ -12,23 +12,23 @@ Ce dépot est destiné au projet de 3A-Esisar "Émulation d'un processeur MIPS"
 
 ## Information
 
-L'émulateur est conçu et testé sur linux. Nous ne garantissons pas son fonctionnement sur une autre platforme.
-Pour compiler le programme, utilisez la commande make.
+L'émulateur et conçus et testé sur linux, nous ne garantissons pas son fonctionnement sur une autre platforme.
+Pour compiler le programme utiliser la commande make.
 
-il y a deux modes d'exécutions:
-* mode interactif  : Les instructions sont données au fur et à mesure par l'utilisateur. On utilise la commande : emul-mips; 
-* mode non-interactif: Les instruction sont données dans un fichier au format assembleur. On utilise la commande : emul-mips nom-fichier. 
+il y a deux modes d'éxécutions:
+* mode interactif  : Les instructions sont données au fur et à mesure par l'utilisateur on utilise la commande emul-mips; 
+* mode non-interactif: Les instruction sont données dans un fichier au format assembleur, emul-mips nom-fichier 
 
-Lorsque le mode non-interactif est utilisé, il est possible de renseigner l'argument "-pas"' qui permet d'exécuter l'émulateur en mode pas à pas.
+pour le mode non-interactif il est possible de renseigner l'argument -pas qui permet d'éxécuter l'émulateur en mode pas à pas
 
 
-## Auteurs
+## Authors
 
 * **Garrigues Clément** 
-* **Moyart Alexis - [@Electroalex](https://gitlab.org/Electroalex26)**
+* **Moyart Alexis** 
 
-## Licence
+## License
 
-Licence aux fillots récursif
+Licence au fillot récursif
 
 
