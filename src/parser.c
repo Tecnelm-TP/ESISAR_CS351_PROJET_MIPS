@@ -18,10 +18,88 @@ int convertOpcodeTohex(char *opcode)
     }
     return result;
 }
+int getBeginSpace(const char* line)
 
+{
+    int result =0 ;
+
+    while (line[result]==' ' && line[result]!='\0'   )
+    {
+        result++;
+    }
+
+    return result;
+    
+}
+void parseExpression(char *src, char *dest)
+{
+    FILE *srcFile;
+    FILE *destFile;
+    int resultparse;
+    char *opcode;
+    int flag = 0;
+    char *line = NULL;
+    int len = 0;
+    int nbSpacestart=0;
+
+    srcFile = fopen(src, "r");
+    if (srcFile == NULL)
+    {
+        fprintf(stderr, "ERROR OPEN FOLDER SRC\n");
+        exit(1);
+    }
+
+    destFile = fopen(dest, "w");
+    if (destFile == NULL)
+    {
+        fprintf(stderr, "ERROR OPEN FOLDER DEST\n");
+        exit(1);
+    }
+
+    while (!feof(srcFile))
+    {
+        line = NULL;
+        getline(&line, &len, srcFile);
+        if (line)
+        {
+            
+            nbSpacestart = getBeginSpace(line);
+
+            opcode = strtok(line, delimiters);
+
+            if (opcode != NULL && *(line+nbSpacestart)!='\n' && *(line+nbSpacestart) != '#')
+            {
+
+                for (int i = 0; i < NB_INSTRUCTION && !flag; i++)
+                {
+                    if (!strcmp(opcode, opCodeL[i]))
+                    {
+                        resultparse = instToHex(instrL[i]);
+                        flag = 1;
+                    }
+                }
+                if (flag)
+                {
+                    flag = 0;
+                    fprintf(destFile, "%08X\n", resultparse);
+                    fprintf(stdout, "%08X\n", resultparse);
+                }
+                else
+                {
+                    fprintf(stderr, "ERROR INSTRUCTION NOT IMPLEMENTED\n");
+                }
+            }
+
+            free(line);
+        }
+    }
+
+    fclose(srcFile);
+    fclose(destFile);
+}
 int test()
 {
-
+    /*
     char *opcode;
     int result;
     int flag = 0;
@@ -40,7 +118,10 @@ int test()
         }
     }
 
-    fprintf(stdout, "%08X\n", result);
+    fprintf(stdout, "%08X\n", result);*/
+
+    initInstruction(instrL);
+    parseExpression("/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in1.txt", "/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexified/in.txt");
 
     return 0;
 }
@@ -48,7 +129,7 @@ int test()
 int instToHex(Instruction instruction)
 {
     int hex;
-    switch (instruction.mode)
+    switch (instruction.type)
     {
     case A:
         hex = typeAParseHEX(instruction);
@@ -198,6 +279,7 @@ char *opCodeL[] = {
     "MFLO",
 
     "NOP"};
+
 const int opCodehex[] = {
     ADD,
     AND,
@@ -216,7 +298,9 @@ const int opCodehex[] = {
     MFHI,
     MFLO,
     ///fin TYPED
-    NOP};
+    NOP
+
+};
 
 const int typeNb[] =
     {
