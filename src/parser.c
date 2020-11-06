@@ -5,7 +5,7 @@
 #include "parser.h"
 #include "opcode.h"
 
-const char delimiters[] = ", #$\n";
+const char delimiters[] = ", #$\n()";
 
 int getBeginSpace(const char *line)
 
@@ -28,6 +28,7 @@ void parseFolder(char *src, char *dest)
     int flag = instrERR_missing;
     char *line = NULL;
     size_t len = 0;
+    char *opcode;
 
     srcFile = fopen(src, "r");
     if (srcFile == NULL)
@@ -46,7 +47,7 @@ void parseFolder(char *src, char *dest)
     while (!feof(srcFile))
     {
         line = NULL;
-        getline(&line,&len,srcFile);
+        getline(&line, &len, srcFile);
 
         if (line)
         {
@@ -55,19 +56,20 @@ void parseFolder(char *src, char *dest)
             if (flag == instrERR_parsed)
             {
                 fprintf(destFile, "%08X\n", resultparse);
-                fprintf(stdout, "%08X\n", resultparse);
+                fprintf(stdout, "%08X\n ", resultparse);
             }
             else if (flag == instrERR_blankOrComment_line)
             {
                 fprintf(stdout, "No instruction or comment\n");
             }
-            else if (flag==instrERR_error_parsing)
+            else if (flag == instrERR_error_parsing)
             {
                 fprintf(stderr, "ERROR PARSING\n");
             }
             else
             {
-                fprintf(stderr, "ERROR INSTRUCTION NOT IMPLEMENTED\n");
+                opcode = strtok(line, delimiters);
+                fprintf(stderr, "%s :ERROR INSTRUCTION NOT IMPLEMENTED\n", opcode);
             }
 
             free(line);
@@ -96,7 +98,7 @@ int parseExpressionStr(char *line, int *flagErr)
             if (!strcmp(opcode, opCodeL[i]))
             {
                 *flagErr = instrERR_parsed;
-                resultparse = instToHex(instrL[i],flagErr);
+                resultparse = instToHex(instrL[i], flagErr);
             }
         }
     }
@@ -109,7 +111,7 @@ int parseExpressionStr(char *line, int *flagErr)
 int test()
 {
     initInstruction(instrL);
-    parseFolder("/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in1.txt", "/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexified/in.txt");
+    parseFolder("/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in2.txt", "/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexified/in.txt");
 
     return 0;
 }
@@ -117,30 +119,64 @@ int test()
 int instToHex(Instruction instruction, int *flagErr)
 {
     int hex;
-    switch (instruction.type)
+    switch (instruction.mode)
     {
-    case A:
-        hex = typeAParseHEX(instruction, flagErr);
+    case R:
+        switch (instruction.type)
+        {
+        case RA:
+            hex = typeRAParseHEX(instruction, flagErr);
+            break;
+        case RB:
+            hex = typeRBParseHEX(instruction, flagErr);
+            break;
+        case RC:
+            hex = typeRCParseHEX(instruction, flagErr);
+            break;
+        case RD:
+            hex = typeRDParseHEX(instruction, flagErr);
+            break;
+        case Rother:
+            hex = typeROtherParseHEX(instruction, flagErr);
+            break;
+        default:
+            hex = 0;
+            break;
+        }
         break;
-    case B:
-        hex = typeBParseHEX(instruction, flagErr);
+    case I:
+        switch (instruction.type)
+        {
+        case IA:
+            hex = typeIAParseHEX(instruction, flagErr);
+            break;
+        case IB:
+            hex = typeIBParseHEX(instruction, flagErr);
+            break;
+        case IC:
+            hex = typeICParseHEX(instruction, flagErr);
+            break;
+        case ID:
+            hex = typeIDParseHEX(instruction, flagErr);
+            break;
+        default:
+            hex = 0;
+            break;
+        }
+
         break;
-    case C:
-        hex = typeCParseHEX(instruction, flagErr);
+    case Ju:
+        hex = typeJTypeParseHEX(instruction, flagErr);
         break;
-    case D:
-        hex = typeDParseHEX(instruction, flagErr);
-        break;
-    case other:
-        hex = typeOtherParseHEX(instruction, flagErr);
-        break;
+
     default:
         break;
     }
+
     return hex;
 }
 
-int typeAParseHEX(Instruction instr, int *flagErr)
+int typeRAParseHEX(Instruction instr, int *flagErr)
 {
     char *rs;
     char *rt;
@@ -167,7 +203,7 @@ int typeAParseHEX(Instruction instr, int *flagErr)
 
     return instr.hexCode + (rdi << 11) + (rti << 16) + (rsi << 21);
 }
-int typeBParseHEX(Instruction instr, int *flagErr)
+int typeRBParseHEX(Instruction instr, int *flagErr)
 {
     char *rt;
     char *rd;
@@ -200,7 +236,7 @@ int typeBParseHEX(Instruction instr, int *flagErr)
     return instr.hexCode + (sai << 6) + (rdi << 11) + (rti << 16) + (rsi << 21);
 }
 
-int typeCParseHEX(Instruction instr, int *flagErr)
+int typeRCParseHEX(Instruction instr, int *flagErr)
 {
     char *rs;
     char *rt;
@@ -225,7 +261,7 @@ int typeCParseHEX(Instruction instr, int *flagErr)
     return (rsi << 21) + (rti << 16) + (rdi << 11) + (sai << 6) + instr.hexCode;
 }
 
-int typeDParseHEX(Instruction instr, int *flagErr)
+int typeRDParseHEX(Instruction instr, int *flagErr)
 {
     char *rd;
 
@@ -246,27 +282,200 @@ int typeDParseHEX(Instruction instr, int *flagErr)
     }
     return instr.hexCode + (sai << 6) + (rdi << 11) + (rti << 16) + (rsi << 21);
 }
-int typeOtherParseHEX(Instruction instr, int *flagErr)
+int typeROtherParseHEX(Instruction instr, int *flagErr)
 {
-    int hex;
+    char *rs;
+
+    int rdi = 0;
+    int rsi = 0;
+    int rti = 0;
+    int sai = 0;
+
     if (!strcmp(instr.name, "NOP"))
     {
-        hex = 0;
+    }
+    else if (!strcmp(instr.name, "JR"))
+    {
+        rs = strtok(NULL, delimiters);
+        if (rs == NULL)
+        {
+            *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            rsi = atoi(rs);
+            sai = 0; //replace with hint
+        }
     }
 
-    return hex;
+    return instr.hexCode + (sai << 6) + (rdi << 11) + (rti << 16) + (rsi << 21);
+    ;
+}
+
+int typeIAParseHEX(Instruction instr, int *flagErr)
+{
+    char *rs;
+    char *rt;
+    char *offset;
+
+    int rti = 0;
+    int rsi = 0;
+    int offseti = 0;
+
+    rt = strtok(NULL, delimiters);
+    rs = strtok(NULL, delimiters);
+    offset = strtok(NULL, delimiters);
+
+    if (rs == NULL || rt == NULL || offset == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        offseti = atoi(offset);
+        rti = atoi(rt);
+        rsi = atoi(rs);
+        
+        /* code */
+    }
+
+    return (instr.hexCode<<26) + (rsi << 21) + (rti << 16) + (offseti);
+    
+}
+int typeIBParseHEX(Instruction instr, int *flagErr)
+{
+    char *rs;
+    char *offset;
+
+    int rti = 0;
+    int rsi = 0;
+    int offseti = 0;
+
+    rs = strtok(NULL, delimiters);
+    offset = strtok(NULL, delimiters);
+
+    if (rs == NULL || offset == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        offseti = atoi(offset);
+        rsi = atoi(rs);
+        /* code */
+    }
+
+    return (instr.hexCode<<26) + (rsi << 21) + (rti << 16) + (offseti);
+}
+int typeICParseHEX(Instruction instr, int *flagErr)
+{
+    char *rt;
+    char *offset;
+
+    int rti = 0;
+    int rsi = 0;
+    int offseti = 0;
+
+    rt = strtok(NULL, delimiters);
+    offset = strtok(NULL, delimiters);
+
+    if (rt == NULL || offset == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        offseti = atoi(offset);
+        rti = atoi(rt);
+
+    }
+
+    return (instr.hexCode<<26) + (rsi << 21) + (rti << 16) + (offseti);
+}
+int typeIDParseHEX(Instruction instr, int *flagErr)
+{
+    char *rt;
+    char *offset;
+    char*base; 
+
+    int rti = 0;
+    int rsi = 0;
+    int offseti = 0;
+
+    rt = strtok(NULL, delimiters);
+    offset = strtok(NULL, delimiters);
+    base=strtok(NULL, delimiters);
+
+
+    if ( base == NULL||rt == NULL || offset == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        offseti = atoi(offset);
+        rti = atoi(rt);
+        rsi = atoi(base);
+        /* code */
+    }
+
+    return (instr.hexCode<<26) + (rsi << 21) + (rti << 16) + (offseti);
+}
+
+int typeJTypeParseHEX(Instruction instr, int *flagErr)
+{
+    char *instIndex;
+    int instIndexI;
+
+    instIndex = strtok(NULL, delimiters);
+
+    if (instIndex == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        instIndexI = atoi(instIndex);
+    }
+
+    return instIndexI + (instr.hexCode << 26);
 }
 
 void initInstruction(Instruction *instruction)
 {
     int i;
     int id = 0;
-    for (i = 0; i < NBTYPE; i++)
+    for (i = 0; i < NBTYPER; i++)
     {
-        for (int b = 0; b < typeNb[i]; b++)
+        for (int b = 0; b < typeNbR[i]; b++)
         {
             instruction[id].name = opCodeL[id];
             instruction[id].mode = R;
+            instruction[id].type = i;
+            instruction[id].hexCode = opCodehex[id];
+            id++;
+        }
+    }
+    beginModeI = id;
+
+    for (i = 0; i < NBTYPEI; i++)
+    {
+        for (int b = 0; b < typeNbI[i]; b++)
+        {
+            instruction[id].name = opCodeL[id];
+            instruction[id].mode = I;
+            instruction[id].type = i;
+            instruction[id].hexCode = opCodehex[id];
+            id++;
+        }
+    }
+    beginModeJ = id;
+    for (i = 0; i < NBTYPEJ; i++)
+    {
+        for (int b = 0; b < typeNbJ[i]; b++)
+        {
+            instruction[id].name = opCodeL[id];
+            instruction[id].mode = Ju;
             instruction[id].type = i;
             instruction[id].hexCode = opCodehex[id];
             id++;
@@ -281,18 +490,41 @@ char *opCodeL[] = {
     "SUB",
     "OR",
     "XOR",
-
+    /// fin TYPE A
     "ROTR",
     "SLL",
     "SRL",
-
+    /// fin TYPEB
     "DIV",
     "MULT",
-
+    ///fin TYPEC
     "MFHI",
     "MFLO",
+    ///fin TYPED
+    "NOP",
+    "JR",
+    "SYSCALL",
 
-    "NOP"};
+    ///Fin mode R
+    "BNE",
+    "ADDI",
+    "BEQ",
+
+    ///fin Itype1
+    "BGTZ",
+    "BLEZ",
+    ///fin Itype2
+    "LUI",
+    ///fin Itype3
+    "SW",
+    "LW",
+    ///fin Itype4
+
+    ///Fin mode I
+    "JAL",
+    "J"
+    ///Fin mode J
+};
 
 const int opCodehex[] = {
     ADD,
@@ -312,12 +544,47 @@ const int opCodehex[] = {
     MFHI,
     MFLO,
     ///fin TYPED
-    NOP
+    NOP,
+    JR,
+    SYSCALL,
+
+    ///Fin mode R
+    BNE,
+    ADDI,
+    BEQ,
+
+    ///fin Itype1
+    BGTZ,
+    BLEZ,
+    ///fin Itype2
+    LUI,
+    ///fin Itype3
+    SW,
+    LW,
+    ///fin Itype4
+
+    ///Fin mode I
+    JAL,
+    J
+    ///Fin mode J
 
 };
 
-const int typeNb[] =
+const int typeNbR[] =
     {
-        6, 3, 2, 2, 1
+        6, 3, 2, 2, 3
 
 };
+const int typeNbJ[] =
+    {
+        2
+
+};
+const int typeNbI[] =
+    {
+        3, 2, 1, 2
+
+};
+
+int beginModeJ;
+int beginModeI;

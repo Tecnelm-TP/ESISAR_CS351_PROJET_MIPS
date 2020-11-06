@@ -10,11 +10,23 @@ enum type_instruction
 };
 enum mode_instructionR
 {
-    A,    // instruction with rs rt rd  ex ADD
-    B,    // instruction with rd rt sa
-    C,    // instruction with rs rt
-    D,    // instruction with rd
-    other // instruction without mode
+    RA,     // instruction with rs rt rd  ex ADD
+    RB,     // instruction with rd rt sa
+    RC,     // instruction with rs rt
+    RD,     // instruction with rd
+    Rother, // instruction without mode
+
+};
+enum mode_instructionI
+{
+    IA, //instruction with offset rs rt
+    IB, // instruction with offset rs
+    IC, //instruction with offset rt
+    ID  //instruction LW SW
+};
+enum mode_instructionJ
+{
+    Jtype
 };
 
 extern char *opCodeL[];
@@ -23,7 +35,7 @@ extern const char delimiters[];
 
 int test();
 void parseFolder(char *src, char *dest);
-int parseExpressionStr( char *line,int* flagErr);
+int parseExpressionStr(char *line, int *flagErr);
 int getBeginSpace(const char *line);
 typedef struct instruction
 {
@@ -34,12 +46,21 @@ typedef struct instruction
 
 } Instruction;
 
-int typeAParseHEX(Instruction instr,int *flagErr);
-int typeBParseHEX(Instruction instr,int *flagErr);
-int typeCParseHEX(Instruction instr,int *flagErr);
-int typeDParseHEX(Instruction instr,int *flagErr);
-int typeOtherParseHEX(Instruction instr,int *flagErr);
-int instToHex(Instruction instruction,int *flagErr);
+int typeRAParseHEX(Instruction instr, int *flagErr);
+int typeRBParseHEX(Instruction instr, int *flagErr);
+int typeRCParseHEX(Instruction instr, int *flagErr);
+int typeRDParseHEX(Instruction instr, int *flagErr);
+int typeROtherParseHEX(Instruction instr, int *flagErr);
+
+int typeIAParseHEX(Instruction instr, int *flagErr);
+int typeIBParseHEX(Instruction instr, int *flagErr);
+int typeICParseHEX(Instruction instr, int *flagErr);
+int typeIDParseHEX(Instruction instr, int *flagErr);
+
+int typeJTypeParseHEX(Instruction instr, int *flagErr);
+
+
+int instToHex(Instruction instruction, int *flagErr);
 void initInstruction(Instruction *instruction);
 
 Instruction instrL[NB_INSTRUCTION];
