@@ -34,9 +34,25 @@ void initialiseMips(Mips proc, const char *programFolderName)
         }
     }
     fclose(program);
+    proc.memory = malloc(sizeof(Register)/sizeof(char));
+    proc.memory->next = NULL;
+    proc.memory->registerID = 0;
+    proc.memory->value = 0;
+
 }
 
 void freeProc(Mips proc)
 {
+    Register *current = proc.memory;
+    Register *prec;
     free(proc.text);
+    
+    do
+    {
+        prec = current;
+        current = current->next;
+        free(prec);
+    } while (current->next != NULL);
+    
+    
 }
