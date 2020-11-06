@@ -1,46 +1,33 @@
+#define _GNU_SOURCE
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "parser.h"
 #include "opcode.h"
 
-const char delimiters[] = ", #$";
+const char delimiters[] = ", #$\n";
 
-int convertOpcodeTohex(char *opcode)
+int getBeginSpace(const char *line)
+
 {
     int result = 0;
-    for (int i = 0; i < NB_INSTRUCTION; i++)
-    {
-        if (!strcmp(opcode, opCodeL[i]))
-        {
-            result = opCodehex[i];
-        }
-    }
-    return result;
-}
-int getBeginSpace(const char* line)
 
-{
-    int result =0 ;
-
-    while (line[result]==' ' && line[result]!='\0'   )
+    while (line[result] == ' ' && line[result] != '\0')
     {
         result++;
     }
 
     return result;
-    
 }
-void parseExpression(char *src, char *dest)
+
+void parseFolder(char *src, char *dest)
 {
     FILE *srcFile;
     FILE *destFile;
     int resultparse;
-    char *opcode;
-    int flag = 0;
+    int flag = instrERR_missing;
     char *line = NULL;
-    int len = 0;
-    int nbSpacestart=0;
+    size_t len = 0;
 
     srcFile = fopen(src, "r");
     if (srcFile == NULL)
@@ -59,35 +46,28 @@ void parseExpression(char *src, char *dest)
     while (!feof(srcFile))
     {
         line = NULL;
-        getline(&line, &len, srcFile);
+        getline(&line,&len,srcFile);
+
         if (line)
         {
-            
-            nbSpacestart = getBeginSpace(line);
+            resultparse = parseExpressionStr(line, &flag);
 
-            opcode = strtok(line, delimiters);
-
-            if (opcode != NULL && *(line+nbSpacestart)!='\n' && *(line+nbSpacestart) != '#')
+            if (flag == instrERR_parsed)
             {
-
-                for (int i = 0; i < NB_INSTRUCTION && !flag; i++)
-                {
-                    if (!strcmp(opcode, opCodeL[i]))
-                    {
-                        resultparse = instToHex(instrL[i]);
-                        flag = 1;
-                    }
-                }
-                if (flag)
-                {
-                    flag = 0;
-                    fprintf(destFile, "%08X\n", resultparse);
-                    fprintf(stdout, "%08X\n", resultparse);
-                }
-                else
-                {
-                    fprintf(stderr, "ERROR INSTRUCTION NOT IMPLEMENTED\n");
-                }
+                fprintf(destFile, "%08X\n", resultparse);
+                fprintf(stdout, "%08X\n", resultparse);
+            }
+            else if (flag == instrERR_blankOrComment_line)
+            {
+                fprintf(stdout, "No instruction or comment\n");
+            }
+            else if (flag==instrERR_error_parsing)
+            {
+                fprintf(stderr, "ERROR PARSING\n");
+            }
+            else
+            {
+                fprintf(stderr, "ERROR INSTRUCTION NOT IMPLEMENTED\n");
             }
 
             free(line);
@@ -97,54 +77,62 @@ void parseExpression(char *src, char *dest)
     fclose(srcFile);
     fclose(destFile);
 }
-int test()
+int parseExpressionStr(char *line, int *flagErr)
 {
-    /*
+    int nbSpacestart = 0;
     char *opcode;
-    int result;
-    int flag = 0;
-    char src[] = "ADD $2,$3,$4 #salutttt comment pas pris en compte";
-    initInstruction(instrL);
+    int resultparse = 0;
+    *flagErr = instrERR_missing;
 
-    Instruction instruction = {"ADD", R, A, ADD};
-    opcode = strtok(src, delimiters);
+    nbSpacestart = getBeginSpace(line);
 
-    for (int i = 0; i < NB_INSTRUCTION && !flag; i++)
+    opcode = strtok(line, delimiters);
+
+    if (opcode != NULL && *(line + nbSpacestart) != '\n' && *(line + nbSpacestart) != '#')
     {
-        if (!strcmp(opcode, opCodeL[i]))
+
+        for (int i = 0; i < NB_INSTRUCTION && !*flagErr; i++)
         {
-            result = instToHex(instrL[i]);
-            flag = 1;
+            if (!strcmp(opcode, opCodeL[i]))
+            {
+                *flagErr = instrERR_parsed;
+                resultparse = instToHex(instrL[i],flagErr);
+            }
         }
     }
-
-    fprintf(stdout, "%08X\n", result);*/
-
+    else
+    {
+        *flagErr = instrERR_blankOrComment_line;
+    }
+    return resultparse;
+}
+int test()
+{
     initInstruction(instrL);
-    parseExpression("/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in1.txt", "/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexified/in.txt");
+    parseFolder("/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in1.txt", "/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexified/in.txt");
 
     return 0;
 }
 
-int instToHex(Instruction instruction)
+int instToHex(Instruction instruction, int *flagErr)
 {
     int hex;
     switch (instruction.type)
     {
     case A:
-        hex = typeAParseHEX(instruction);
+        hex = typeAParseHEX(instruction, flagErr);
         break;
     case B:
-        hex = typeBParseHEX(instruction);
+        hex = typeBParseHEX(instruction, flagErr);
         break;
     case C:
-        hex = typeCParseHEX(instruction);
+        hex = typeCParseHEX(instruction, flagErr);
         break;
     case D:
-        hex = typeDParseHEX(instruction);
+        hex = typeDParseHEX(instruction, flagErr);
         break;
     case other:
-        hex = typeOtherParseHEX(instruction);
+        hex = typeOtherParseHEX(instruction, flagErr);
         break;
     default:
         break;
@@ -152,7 +140,7 @@ int instToHex(Instruction instruction)
     return hex;
 }
 
-int typeAParseHEX(Instruction instr)
+int typeAParseHEX(Instruction instr, int *flagErr)
 {
     char *rs;
     char *rt;
@@ -165,13 +153,21 @@ int typeAParseHEX(Instruction instr)
     rs = strtok(NULL, delimiters);
     rt = strtok(NULL, delimiters);
 
-    rdi = atoi(rd);
-    rsi = atoi(rs);
-    rti = atoi(rt);
+    if (rd == NULL || rs == NULL || rt == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        rti = atoi(rt);
+        rdi = atoi(rd);
+        rsi = atoi(rs);
+        /* code */
+    }
 
-    return instr.hexCode + (rdi << 11) + (rti << 16) + (rsi << 21); // 00641020
+    return instr.hexCode + (rdi << 11) + (rti << 16) + (rsi << 21);
 }
-int typeBParseHEX(Instruction instr)
+int typeBParseHEX(Instruction instr, int *flagErr)
 {
     char *rt;
     char *rd;
@@ -186,10 +182,16 @@ int typeBParseHEX(Instruction instr)
     rt = strtok(NULL, delimiters);
     sa = strtok(NULL, delimiters);
 
-    rdi = atoi(rd);
-    rti = atoi(rt);
-    sai = atoi(sa);
-
+    if (rd == NULL || rt == NULL || sa == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        rdi = atoi(rd);
+        rti = atoi(rt);
+        sai = atoi(sa);
+    }
     if (!strcmp(instr.name, "ROTR"))
     {
         rsi = 1;
@@ -198,7 +200,7 @@ int typeBParseHEX(Instruction instr)
     return instr.hexCode + (sai << 6) + (rdi << 11) + (rti << 16) + (rsi << 21);
 }
 
-int typeCParseHEX(Instruction instr)
+int typeCParseHEX(Instruction instr, int *flagErr)
 {
     char *rs;
     char *rt;
@@ -210,14 +212,20 @@ int typeCParseHEX(Instruction instr)
 
     rs = strtok(NULL, delimiters);
     rt = strtok(NULL, delimiters);
-
-    rti = atoi(rt);
-    rsi = atoi(rs);
+    if (rs == NULL || rt == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        rti = atoi(rt);
+        rsi = atoi(rs);
+    }
 
     return (rsi << 21) + (rti << 16) + (rdi << 11) + (sai << 6) + instr.hexCode;
 }
 
-int typeDParseHEX(Instruction instr)
+int typeDParseHEX(Instruction instr, int *flagErr)
 {
     char *rd;
 
@@ -228,11 +236,17 @@ int typeDParseHEX(Instruction instr)
 
     rd = strtok(NULL, delimiters);
 
-    rdi = atoi(rd);
-
+    if (rd == NULL)
+    {
+        *flagErr = instrERR_error_parsing;
+    }
+    else
+    {
+        rdi = atoi(rd);
+    }
     return instr.hexCode + (sai << 6) + (rdi << 11) + (rti << 16) + (rsi << 21);
 }
-int typeOtherParseHEX(Instruction instr)
+int typeOtherParseHEX(Instruction instr, int *flagErr)
 {
     int hex;
     if (!strcmp(instr.name, "NOP"))
