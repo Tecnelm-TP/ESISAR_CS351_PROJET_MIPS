@@ -1,19 +1,22 @@
 #ifndef __PROCESSOR_H__
 #define __PROCESSOR_H__
-
+#define NBREGISTER 32
 typedef struct processor
 {
-    int registres [32];
+    int registres [NBREGISTER];
     int PC;
 
     int HI;
     int HO;
 
+    int *text;
+
 }Mips;
 
-typedef struct instruction 
-{
-} Instruction;
+extern int programSize;
+
+void initialiseMips(Mips proc,const char *programFolderName);
+void freeProc(Mips proc);
 
 
 

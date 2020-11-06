@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include "parser.h"
 #include "opcode.h"
+#include"processor.h"
 
 const char delimiters[] = ", #$\n()";
-
+int programSize = 0;
 int getBeginSpace(const char *line)
 
 {
@@ -57,6 +58,7 @@ void parseFolder(char *src, char *dest)
             {
                 fprintf(destFile, "%08X\n", resultparse);
                 fprintf(stdout, "%08X\n ", resultparse);
+                programSize++;
             }
             else if (flag == instrERR_blankOrComment_line)
             {
