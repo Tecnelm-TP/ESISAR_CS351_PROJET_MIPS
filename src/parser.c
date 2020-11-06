@@ -2,12 +2,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/dir.h>
 #include "parser.h"
 #include "opcode.h"
-#include"processor.h"
+#include "processor.h"
 
 const char delimiters[] = ", #$\n()";
 int programSize = 0;
+
+
 int getBeginSpace(const char *line)
 
 {
@@ -21,7 +24,7 @@ int getBeginSpace(const char *line)
     return result;
 }
 
-void parseFolder(char *src, char *dest)
+void parseFolder(const char *src, const char *dest)
 {
     FILE *srcFile;
     FILE *destFile;
@@ -37,6 +40,15 @@ void parseFolder(char *src, char *dest)
         fprintf(stderr, "ERROR OPEN FOLDER SRC\n");
         exit(1);
     }
+
+    /* destFile = fopen(dest, "w");
+    if (destFile == NULL)
+    {
+        char* cpy =strdup(dest);
+        *(strrchr(cpy,'/')) = '\0';
+        mkdir(cpy );
+        free (cpy);
+    }*/
 
     destFile = fopen(dest, "w");
     if (destFile == NULL)
@@ -56,13 +68,13 @@ void parseFolder(char *src, char *dest)
 
             if (flag == instrERR_parsed)
             {
-                fprintf(destFile, "%08X\n", resultparse);
-                fprintf(stdout, "%08X\n ", resultparse);
+                fprintf(destFile,"%08X\n", resultparse);
                 programSize++;
+                fprintf(stderr,"%08X\n", resultparse);
             }
             else if (flag == instrERR_blankOrComment_line)
             {
-                fprintf(stdout, "No instruction or comment\n");
+                fprintf(stderr, "No instruction or comment\n");
             }
             else if (flag == instrERR_error_parsing)
             {
@@ -113,7 +125,7 @@ int parseExpressionStr(char *line, int *flagErr)
 int test()
 {
     initInstruction(instrL);
-    parseFolder("/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in2.txt", "/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexified/in.txt");
+    parseFolder("/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in2.txt", "/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexifie/hex/in.txt");
 
     return 0;
 }
@@ -337,12 +349,11 @@ int typeIAParseHEX(Instruction instr, int *flagErr)
         offseti = atoi(offset);
         rti = atoi(rt);
         rsi = atoi(rs);
-        
+
         /* code */
     }
 
-    return (instr.hexCode<<26) + (rsi << 21) + (rti << 16) + (offseti);
-    
+    return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
 }
 int typeIBParseHEX(Instruction instr, int *flagErr)
 {
@@ -367,7 +378,7 @@ int typeIBParseHEX(Instruction instr, int *flagErr)
         /* code */
     }
 
-    return (instr.hexCode<<26) + (rsi << 21) + (rti << 16) + (offseti);
+    return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
 }
 int typeICParseHEX(Instruction instr, int *flagErr)
 {
@@ -389,16 +400,15 @@ int typeICParseHEX(Instruction instr, int *flagErr)
     {
         offseti = atoi(offset);
         rti = atoi(rt);
-
     }
 
-    return (instr.hexCode<<26) + (rsi << 21) + (rti << 16) + (offseti);
+    return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
 }
 int typeIDParseHEX(Instruction instr, int *flagErr)
 {
     char *rt;
     char *offset;
-    char*base; 
+    char *base;
 
     int rti = 0;
     int rsi = 0;
@@ -406,10 +416,9 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
 
     rt = strtok(NULL, delimiters);
     offset = strtok(NULL, delimiters);
-    base=strtok(NULL, delimiters);
+    base = strtok(NULL, delimiters);
 
-
-    if ( base == NULL||rt == NULL || offset == NULL)
+    if (base == NULL || rt == NULL || offset == NULL)
     {
         *flagErr = instrERR_error_parsing;
     }
@@ -421,7 +430,7 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
         /* code */
     }
 
-    return (instr.hexCode<<26) + (rsi << 21) + (rti << 16) + (offseti);
+    return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
 }
 
 int typeJTypeParseHEX(Instruction instr, int *flagErr)
@@ -484,6 +493,71 @@ void initInstruction(Instruction *instruction)
         }
     }
 }
+/*
+int NBINSTRUCTION = 1;
+void V2(const char *path,Instruction** instructionL)
+{
+    FILE* instr ;
+   unsigned int mode;
+    unsigned int type;
+    char* name;
+    unsigned int code;
+    int res;
+    int cnt = 0;
+    
+
+    instr = fopen(path,"r");
+    if(instr == NULL){
+        fprintf(stderr,"ERROR OPEN FOLDER\n");
+        exit(EXIT_FAILURE);
+    }
+
+    name = malloc(sizeof(char)*MAXCHARINSTR /sizeof(char));
+    while (!feof(instr))
+    {
+
+        res = fscanf(instr,"%s %X %X %X\n",name,&code,&mode,&type);
+        if(res>0)
+        {
+            NBINSTRUCTION++;
+        }
+        
+    }
+    free(name);
+    fseek(instr,0,SEEK_SET);
+    *instructionL = malloc(sizeof(Instruction)*NBINSTRUCTION/sizeof(char));
+
+    while (!feof(instr))
+    {
+        name = malloc(sizeof(char)*MAXCHARINSTR /sizeof(char));
+        res = fscanf(instr,"%s %X %X %X\n",name,&code,&mode,&type);
+        if(res>0)
+        {
+            (*instructionL)[cnt].hexCode = code;
+            (*instructionL)[cnt].name = name;
+            (*instructionL)[cnt].type = type;
+            (*instructionL)[cnt++].mode = mode;
+        }else
+        {
+            free(name);
+        }
+        
+    }
+    
+
+
+
+    fclose(instr);
+
+}
+void freeV2(Instruction* instr)
+{
+    for(int i = 0 ; i<NBINSTRUCTION ; i++)
+    {
+        free((instr)[i].name);
+    }
+    free(instr);
+}*/
 
 char *opCodeL[] = {
     "ADD",

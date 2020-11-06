@@ -3,20 +3,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void initialiseMips(Mips proc, const char *programFolderName)
+void initialiseMips(Mips *processor, const char *programFolderName)
 {
     FILE *program;
     int res;
     int PC = 0;
-    int tempVal;
+    unsigned int tempVal;
 
-    proc.text = malloc(programSize * sizeof(int) / sizeof(char));
-    proc.PC = 0;
-    proc.HI = 0;
-    proc.HO = 0;
+    processor->text = malloc(programSize * sizeof(int) / sizeof(char));
+
+    processor->PC = 0;
+    processor->HI = 0;
+    processor->HO = 0;
     for (int i = 0; i < NBREGISTER; i++)
     {
-        proc.registres[i] = 0;
+        processor->registres[i] = 0;
     }
     program = fopen(programFolderName, "r");
     if (program == NULL)
@@ -30,29 +31,51 @@ void initialiseMips(Mips proc, const char *programFolderName)
         if (res == 1)
         {
             fprintf(stdout,"%08X\t%08X\n",PC<<2,tempVal);
-            proc.text[PC++] = tempVal;
+            processor->text[PC++] = tempVal;
         }
     }
     fclose(program);
-    proc.memory = malloc(sizeof(Register)/sizeof(char));
-    proc.memory->next = NULL;
-    proc.memory->registerID = 0;
-    proc.memory->value = 0;
+    processor->memory = malloc(sizeof(Register)/sizeof(char));
+    processor->memory->next = NULL;
+    processor->memory->registerID = 0;
+    processor->memory->value = 0;
 
 }
 
-void freeProc(Mips proc)
+void freeProc(Mips processor)
 {
-    Register *current = proc.memory;
+    Register *current = processor.memory;
     Register *prec;
-    free(proc.text);
-    
-    do
+    free(processor.text);
+    while (current->next !=NULL)
     {
-        prec = current;
-        current = current->next;
+        prec= current;
+        current = current->next; 
         free(prec);
-    } while (current->next != NULL);
+    }
+    free(current);
     
+
+}
+Register* getregister(Mips processor,int registerID)
+{
+    Register* reg = processor.memory;
+    while ((reg =reg->next) != NULL && reg->registerID != registerID);
+    return reg;
+}
+
+void addRegister(Mips processor,int registerID,int value)
+{
+    Register* reg = processor.memory;
+    Register* new = malloc(sizeof(Register)/sizeof(char));
+
+    while (reg->next != NULL)
+    {
+        reg = reg->next;
+    }
+    reg->next = new;
     
+    new->registerID = registerID;
+    new->next = NULL;
+    new->value = value;
 }

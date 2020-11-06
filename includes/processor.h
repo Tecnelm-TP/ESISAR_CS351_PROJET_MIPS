@@ -4,6 +4,7 @@
 
 typedef struct memRegister Register;
 typedef struct processor Mips;
+extern int modePas;
  struct processor
 {
     int registres [NBREGISTER];
@@ -13,6 +14,7 @@ typedef struct processor Mips;
     int HO;
 
     int *text;
+
     Register* memory;
 };
 
@@ -25,9 +27,10 @@ extern int programSize;
     struct memRegister* next;
 };
 
-void initialiseMips(Mips proc,const char *programFolderName);
-void freeProc(Mips proc);
+void initialiseMips(Mips *processor,const char *programFolderName);
+void freeProc(Mips processor);
 
-
+Register* getregister(Mips processor,int registerID);
+void addRegister(Mips processor,int registerID,int value);
 
 #endif // !__PROCESSOR_H__

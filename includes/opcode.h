@@ -39,6 +39,7 @@ extern const int typeNbR[NBTYPER];
 extern const int typeNbJ[NBTYPEJ];
 extern const int typeNbI[NBTYPEI];
 
+
 extern int beginModeJ;
 extern int beginModeI;
 

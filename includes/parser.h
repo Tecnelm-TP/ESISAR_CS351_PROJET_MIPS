@@ -2,6 +2,7 @@
 
 #define __PARSER_H__
 #include "opcode.h"
+#define MAXCHARINSTR 10
 enum type_instruction
 {
     R,
@@ -34,7 +35,7 @@ extern const int opCodehex[];
 extern const char delimiters[];
 
 int test();
-void parseFolder(char *src, char *dest);
+void parseFolder(const char *src, const char *dest);
 int parseExpressionStr(char *line, int *flagErr);
 int getBeginSpace(const char *line);
 typedef struct instruction
@@ -62,6 +63,12 @@ int typeJTypeParseHEX(Instruction instr, int *flagErr);
 
 int instToHex(Instruction instruction, int *flagErr);
 void initInstruction(Instruction *instruction);
+/*
+extern int NBINSTRUCTION;
+
+void V2(const char *path,Instruction** instructionL);
+void freeV2(Instruction* instr);*/
+
 
 Instruction instrL[NB_INSTRUCTION];
 
