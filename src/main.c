@@ -6,13 +6,13 @@
 #include "parser.h"
 #include "processor.h"
 
-int modePas;
-
 int main(int argc, char *argv[])
 {
     static int folderIsHEX;
     static int inputSpecified;
     static int outputSpecified;
+    static int needHelp;
+    static int modePas;
 
     char *src;
     char *dest;
@@ -22,9 +22,10 @@ int main(int argc, char *argv[])
         {
             {"pas", no_argument, &modePas, 1},
             {"hex", no_argument, &folderIsHEX, 1},
+            {"help", no_argument, &needHelp, 1},
             {0, 0, 0, 0}};
 
-    while ((opt = getopt_long(argc, argv, "o:i:", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "o:i:hp", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -39,6 +40,12 @@ int main(int argc, char *argv[])
             outputSpecified = 1;
             dest = optarg + getBeginSpace(optarg);
 
+            break;
+        case 'h':
+            needHelp = 1;
+            break;
+        case 'p':
+            modePas = 1;
             break;
         default:
             break;
@@ -62,19 +69,23 @@ int main(int argc, char *argv[])
         }
 
         initialiseMips(&proc, folderIsHEX ? src : dest);
+        executeProgramm(modePas, &proc);
 
-
-        
         if (!outputSpecified)
         {
             free(dest);
         }
         freeProc(proc);
-    }else
-    {
-        fprintf(stderr,"ERROR NO SOURCE FILE SCPECIFIED\n");
     }
-    
+    else
+    {
+        if (needHelp)
+        {
+            fprintf(stdout, " -i: specified input file\n -o: specified output file\n --hex: folder input is already parsed in hexcode\n --pas/-p: activate mode step by step\n");
+        }
+        else
+            fprintf(stderr, "ERROR NO SOURCE FILE SCPECIFIED\n -h/--help to get options\n");
+    }
 
     return 0;
 }

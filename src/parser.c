@@ -147,7 +147,7 @@ int instToHex(Instruction instruction, int *flagErr)
         case RC:
             hex = typeRCParseHEX(instruction, flagErr);
             break;
-        case RD:
+        case RMD:
             hex = typeRDParseHEX(instruction, flagErr);
             break;
         case Rother:

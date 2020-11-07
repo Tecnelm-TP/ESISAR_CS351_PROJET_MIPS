@@ -35,6 +35,16 @@
 #define NBTYPEJ 1
 #define NBTYPEI 4
 
+#define RINTRCODE 0x00003F//0
+#define SA 0x000007C0  //5
+#define RD 0x0000F800  //11
+#define RT 0x001F0000  //16
+#define RS 0x03E00000  //21
+
+#define IINTRCODE 0xFF0000
+
+
+
 extern const int typeNbR[NBTYPER];
 extern const int typeNbJ[NBTYPEJ];
 extern const int typeNbI[NBTYPEI];

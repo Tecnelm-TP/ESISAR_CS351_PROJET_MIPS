@@ -14,7 +14,7 @@ enum mode_instructionR
     RA,     // instruction with rs rt rd  ex ADD
     RB,     // instruction with rd rt sa
     RC,     // instruction with rs rt
-    RD,     // instruction with rd
+    RMD,     // instruction with rd
     Rother, // instruction without mode
 
 };
