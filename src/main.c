@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         {
             free(dest);
         }
-        freeProc(proc);
+        freeProc(&proc);
     }
     else
     {
@@ -84,7 +84,11 @@ int main(int argc, char *argv[])
             fprintf(stdout, " -i: specified input file\n -o: specified output file\n --hex: folder input is already parsed in hexcode\n --pas/-p: activate mode step by step\n");
         }
         else
-            fprintf(stderr, "ERROR NO SOURCE FILE SCPECIFIED\n -h/--help to get options\n");
+        {
+            executeInteractiv(&proc);
+        }
+        
+    
     }
 
     return 0;

@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "processor.h"
-#include "processor_operation.h"
-#include "parser.h"
+#define _GNU_SOURCE
+
 
 #define getSA(i) sa = (i & SA) >> 5
 #define getRD(i) rd = (i & RD) >> 11
@@ -12,6 +9,12 @@
 #define flush(std, c) while (c != '\n' && c != EOF) c = getc(stdin);
 
 #define wait() int c = getc(stdin); flush(sdin, c);
+#include <stdio.h>
+#include <stdlib.h>
+#include "processor.h"
+#include "processor_operation.h"
+#include "parser.h"
+#include "string.h"
 
 void initialiseMips(Mips *processor, const char *programFolderName)
 {
@@ -51,11 +54,11 @@ void initialiseMips(Mips *processor, const char *programFolderName)
     processor->memory->value = 0;
 }
 
-void freeProc(Mips processor)
+void freeProc(Mips *processor)
 {
-    Register *current = processor.memory;
+    Register *current = processor->memory;
     Register *prec;
-    free(processor.text);
+    free(processor->text);
     while (current->next != NULL)
     {
         prec = current;
@@ -64,17 +67,17 @@ void freeProc(Mips processor)
     }
     free(current);
 }
-Register *getregister(Mips processor, int registerID)
+Register *getregister(Mips *processor, int registerID)
 {
-    Register *reg = processor.memory;
+    Register *reg = processor->memory;
     while ((reg = reg->next) != NULL && reg->registerID != registerID)
         ;
     return reg;
 }
 
-void addRegister(Mips processor, int registerID, int value)
+void addRegister(Mips *processor, int registerID, int value)
 {
-    Register *reg = processor.memory;
+    Register *reg = processor->memory;
     Register *new = malloc(sizeof(Register) / sizeof(char));
 
     while (reg->next != NULL)
@@ -97,6 +100,38 @@ void executeProgramm(int pas, Mips *processor)
             wait();
         }
     }
+}
+void executeInteractiv(Mips *processor)
+{
+    char* line ;
+    size_t len;
+    int flagErr;
+    int instruction;
+    int flagStop = 0;
+    fprintf(stdout,"Entering in interactiv mode : EXIT to stop \n");
+
+    do
+    {
+        line = NULL;
+        fprintf(stdout,"enter instuction : \n");
+        getline(&line,&len,stdin);
+
+        if(!strncmp(line,"EXIT",4))
+            flagStop = 1;
+        else
+        {
+            instruction = parseExpressionStr(line,&flagErr);
+            executeInstruction(instruction,processor);
+        }
+        free(line);
+
+        
+    } while (!flagStop);
+    
+    
+    
+    
+
 }
 void executeInstruction(unsigned int instruction, Mips *processor)
 {
