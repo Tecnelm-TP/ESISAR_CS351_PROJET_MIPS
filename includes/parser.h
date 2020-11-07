@@ -14,7 +14,7 @@ enum mode_instructionR
     RA,     // instruction with rs rt rd  ex ADD
     RB,     // instruction with rd rt sa
     RC,     // instruction with rs rt
-    RMD,     // instruction with rd
+    RMD,    // instruction with rd
     Rother, // instruction without mode
 
 };
@@ -34,7 +34,6 @@ extern char *opCodeL[];
 extern const int opCodehex[];
 extern const char delimiters[];
 
-int test();
 void parseFolder(const char *src, const char *dest);
 int parseExpressionStr(char *line, int *flagErr);
 int getBeginSpace(const char *line);
@@ -60,7 +59,6 @@ int typeIDParseHEX(Instruction instr, int *flagErr);
 
 int typeJTypeParseHEX(Instruction instr, int *flagErr);
 
-
 int instToHex(Instruction instruction, int *flagErr);
 void initInstruction(Instruction *instruction);
 /*
@@ -68,7 +66,6 @@ extern int NBINSTRUCTION;
 
 void V2(const char *path,Instruction** instructionL);
 void freeV2(Instruction* instr);*/
-
 
 Instruction instrL[NB_INSTRUCTION];
 

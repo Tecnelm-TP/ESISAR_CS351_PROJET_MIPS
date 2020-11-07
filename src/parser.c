@@ -10,7 +10,6 @@
 const char delimiters[] = ", #$\n()";
 int programSize = 0;
 
-
 int getBeginSpace(const char *line)
 
 {
@@ -40,16 +39,6 @@ void parseFolder(const char *src, const char *dest)
         fprintf(stderr, "ERROR OPEN FOLDER SRC\n");
         exit(1);
     }
-
-    /* destFile = fopen(dest, "w");
-    if (destFile == NULL)
-    {
-        char* cpy =strdup(dest);
-        *(strrchr(cpy,'/')) = '\0';
-        mkdir(cpy );
-        free (cpy);
-    }*/
-
     destFile = fopen(dest, "w");
     if (destFile == NULL)
     {
@@ -68,9 +57,9 @@ void parseFolder(const char *src, const char *dest)
 
             if (flag == instrERR_parsed)
             {
-                fprintf(destFile,"%08X\n", resultparse);
+                fprintf(destFile, "%08X\n", resultparse);
                 programSize++;
-                fprintf(stderr,"%08X\n", resultparse);
+                fprintf(stderr, "%08X\n", resultparse);
             }
             else if (flag == instrERR_blankOrComment_line)
             {
@@ -121,13 +110,6 @@ int parseExpressionStr(char *line, int *flagErr)
         *flagErr = instrERR_blankOrComment_line;
     }
     return resultparse;
-}
-int test()
-{
-    initInstruction(instrL);
-    parseFolder("/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in2.txt", "/mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexifie/hex/in.txt");
-
-    return 0;
 }
 
 int instToHex(Instruction instruction, int *flagErr)
@@ -187,8 +169,11 @@ int instToHex(Instruction instruction, int *flagErr)
         break;
     }
 
+
+
     return hex;
 }
+
 
 int typeRAParseHEX(Instruction instr, int *flagErr)
 {

@@ -1,14 +1,20 @@
 #define _GNU_SOURCE
 
+#define getSA(i, sa) sa = (i & SA) >> 5
+#define getRD(i, rd) rd = (i & RD) >> 11
+#define getRT(i, rt) rt = (i & RT) >> 16
+#define getRS(i, rs) rs = (i & RS) >> 21
+#define getOffset(i, offset) offset = (i & OFFSET)
+#define getCode(i, offset) offset = (i & CODE) >> 6
+#define getinstr_index(i, offset) offset = (i & INSTRINDEX)
 
-#define getSA(i) sa = (i & SA) >> 5
-#define getRD(i) rd = (i & RD) >> 11
-#define getRT(i) rt = (i & RT) >> 16
-#define getRS(i) rs = (i & RS) >> 21
+#define flush(std, c)             \
+    while (c != '\n' && c != EOF) \
+        c = getc(stdin);
+#define wait()           \
+    int c = getc(stdin); \
+    flush(sdin, c);
 
-#define flush(std, c) while (c != '\n' && c != EOF) c = getc(stdin);
-
-#define wait() int c = getc(stdin); flush(sdin, c);
 #include <stdio.h>
 #include <stdlib.h>
 #include "processor.h"
@@ -103,35 +109,29 @@ void executeProgramm(int pas, Mips *processor)
 }
 void executeInteractiv(Mips *processor)
 {
-    char* line ;
+    char *line;
     size_t len;
     int flagErr;
     int instruction;
     int flagStop = 0;
-    fprintf(stdout,"Entering in interactiv mode : EXIT to stop \n");
+    fprintf(stdout, "Entering in interactiv mode : EXIT to stop \n");
 
     do
     {
         line = NULL;
-        fprintf(stdout,"enter instuction : \n");
-        getline(&line,&len,stdin);
+        fprintf(stdout, "enter instuction : \n");
+        getline(&line, &len, stdin);
 
-        if(!strncmp(line,"EXIT",4))
+        if (!strncmp(line, "EXIT", 4))
             flagStop = 1;
         else
         {
-            instruction = parseExpressionStr(line,&flagErr);
-            executeInstruction(instruction,processor);
+            instruction = parseExpressionStr(line, &flagErr);
+            executeInstruction(instruction, processor);
         }
         free(line);
 
-        
     } while (!flagStop);
-    
-    
-    
-    
-
 }
 void executeInstruction(unsigned int instruction, Mips *processor)
 {
@@ -142,9 +142,10 @@ void executeInstruction(unsigned int instruction, Mips *processor)
     {
         if (!(instruction & IINTRCODE))
         {
-            getRS(instruction);
-            getRD(instruction);
-            getRT(instruction);
+            getRS(instruction, rs);
+            getRD(instruction, rd);
+            getRT(instruction, rt);
+            getCode(instruction, offset);
             switch (instruction & RINTRCODE)
             {
             case ADD:
@@ -195,6 +196,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
                 jr(rs, processor);
                 break;
             case SYSCALL:
+                getCode(instruction, offset);
                 syscall(offset, processor);
                 break;
 
@@ -204,6 +206,9 @@ void executeInstruction(unsigned int instruction, Mips *processor)
         }
         else
         {
+            getRS(instruction, rs);
+            getRT(instruction, rt);
+            getOffset(instruction, offset);
             switch (instruction & IINTRCODE)
             {
             case BNE:
@@ -231,9 +236,11 @@ void executeInstruction(unsigned int instruction, Mips *processor)
                 lw(rt, offset, rs, processor);
                 break;
             case JAL:
+                getinstr_index(instruction, offset);
                 jal(offset, processor);
                 break;
             case J:
+                getinstr_index(instruction, offset);
                 j(offset, processor);
                 break;
             default:

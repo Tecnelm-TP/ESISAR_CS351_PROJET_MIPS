@@ -40,6 +40,9 @@
 #define RD 0x0000F800  //11
 #define RT 0x001F0000  //16
 #define RS 0x03E00000  //21
+#define OFFSET 0x0000FFFF
+#define CODE 0x03FFFFC0
+#define INSTRINDEX 0x03FFFFFF
 
 #define IINTRCODE 0xFF0000
 
