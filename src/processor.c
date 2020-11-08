@@ -145,7 +145,9 @@ void executeInteractiv(Mips *processor)
 }
 void executeInstruction(unsigned int instruction, Mips *processor)
 {
-    int rs = 0, rd = 0, rt = 0, sa = 0, offset = 0;
+    int rs = 0, rd = 0, rt = 0, sa = 0;
+    
+    short int offset = 0;
 
     if (instruction != 0)
     {

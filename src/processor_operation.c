@@ -80,30 +80,30 @@ void syscall(int code, Mips *processor)
 {
 }
 
-void bne(int rs, int rt, int offset, Mips *processor)
+void bne(int rs, int rt, short int offset, Mips *processor)
 {
 }
-void addi(int rs, int rt, int offset, Mips *processor)
+void addi(int rs, int rt, short int offset, Mips *processor)
 {
-    processor->registres[rt] = processor->registres[rs] + offset;
+    processor->registres[rt] = processor->registres[rs] +  offset;
     fprintf(stdout, "{ADDI $%d,$%d,%d }\n", rt, rs, offset);
 }
-void beq(int rs, int rt, int offset, Mips *processor)
+void beq(int rs, int rt, short int offset, Mips *processor)
 {
 }
-void bgtz(int rs, int offset, Mips *processor)
+void bgtz(int rs, short int offset, Mips *processor)
 {
 }
-void blez(int rs, int offset, Mips *processor)
+void blez(int rs, short int offset, Mips *processor)
 {
 }
-void lui(int rt, int offset, Mips *processor)
+void lui(int rt, short int offset, Mips *processor)
 {
     processor->registres[rt] = offset << 16;
     fprintf(stdout, "{LUI %d,$%d}\n", rt, offset);
 }
 
-void sw(int rt, int offset, int base, Mips *processor)
+void sw(int rt, short int offset, int base, Mips *processor)
 {
     Register *reg = getregister(processor, processor->registres[base] + offset);
     if (reg == NULL)
@@ -116,7 +116,7 @@ void sw(int rt, int offset, int base, Mips *processor)
     }
     fprintf(stdout, "{SW $%d,%d($%d)}\n", rt, offset, base);
 }
-void lw(int rt, int offset, int base, Mips *processor)
+void lw(int rt, short int offset, int base, Mips *processor)
 {
     Register *reg = getregister(processor, processor->registres[base] + offset);
     if (reg == NULL)

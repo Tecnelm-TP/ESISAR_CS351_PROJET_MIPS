@@ -43,6 +43,7 @@ void parseFolder(const char *src, const char *dest)
     if (destFile == NULL)
     {
         fprintf(stderr, "ERROR OPEN FOLDER DEST\n");
+        fclose(srcFile);
         exit(1);
     }
 
@@ -328,9 +329,10 @@ int typeIAParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = atoi(offset);
+        offseti = atoi(offset) & 0xFFFF;
         rti = atoi(rt);
         rsi = atoi(rs);
+        
 
         /* code */
     }
@@ -355,9 +357,8 @@ int typeIBParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = atoi(offset);
+        offseti = atoi(offset) & 0xFFFF;
         rsi = atoi(rs);
-        /* code */
     }
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
@@ -380,8 +381,8 @@ int typeICParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = atoi(offset);
-        rti = atoi(rt);
+        offseti = atoi(offset) & 0xFFFF;
+
     }
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
@@ -406,10 +407,10 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = atoi(offset);
+        offseti = atoi(offset) & 0xFFFF;
         rti = atoi(rt);
         rsi = atoi(base);
-        /* code */
+
     }
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
