@@ -85,8 +85,8 @@ void bne(int rs, int rt, short int offset, Mips *processor)
 }
 void addi(int rs, int rt, short int offset, Mips *processor)
 {
-    processor->registres[rt] = processor->registres[rs] +  offset;
-    fprintf(stdout, "{ADDI $%d,$%d,%d }\n", rt, rs, offset);
+    processor->registres[rt] = processor->registres[rs] + offset;
+    fprintf(stdout, "{ADDI $%d,$%d,0x%X }\n", rt, rs, offset);
 }
 void beq(int rs, int rt, short int offset, Mips *processor)
 {
@@ -100,7 +100,7 @@ void blez(int rs, short int offset, Mips *processor)
 void lui(int rt, short int offset, Mips *processor)
 {
     processor->registres[rt] = offset << 16;
-    fprintf(stdout, "{LUI %d,$%d}\n", rt, offset);
+    fprintf(stdout, "{LUI %d,0x%X}\n", rt, offset);
 }
 
 void sw(int rt, short int offset, int base, Mips *processor)
@@ -114,7 +114,7 @@ void sw(int rt, short int offset, int base, Mips *processor)
     {
         reg->value = processor->registres[rt];
     }
-    fprintf(stdout, "{SW $%d,%d($%d)}\n", rt, offset, base);
+    fprintf(stdout, "{SW $%d,0x%X(0x%X)}\n", rt, offset, base);
 }
 void lw(int rt, short int offset, int base, Mips *processor)
 {
@@ -128,7 +128,7 @@ void lw(int rt, short int offset, int base, Mips *processor)
     {
         processor->registres[rt] = reg->value;
     }
-    fprintf(stdout, "{LW $%d,%d($%d)}\n", rt, offset, base);
+    fprintf(stdout, "{LW $%d,0x%X(0x%X)}\n", rt, offset, base);
 }
 
 void jal(int offset, Mips *processor)

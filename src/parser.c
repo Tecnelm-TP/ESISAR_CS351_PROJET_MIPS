@@ -439,8 +439,17 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
             offseti = atoi(offset) & 0xFFFF;
             /* code */
         }
+        if (base[0] == '0' && base[1] == 'x')
+        {
+            rsi = strtol(base, NULL, 16);
+        }
+        else
+        {
+            rsi = atoi(base);
+            /* code */
+        }
+
         rti = atoi(rt);
-        rsi = atoi(base);
     }
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
