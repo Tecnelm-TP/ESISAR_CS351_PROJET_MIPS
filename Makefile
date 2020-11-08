@@ -1,5 +1,5 @@
 LANGAGE = C
-EXEC = exe
+EXEC = emul-mips
 DEBUG = yes
 CFLAGS = -Wall -ansi -pedantic -std=c99
 STATICDEFINE = TEST

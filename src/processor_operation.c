@@ -1,5 +1,5 @@
-#include "processor_operation.h"
 #include <stdio.h>
+#include "processor_operation.h"
 
 void add(int rd, int rt, int rs, Mips *processor)
 {

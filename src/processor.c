@@ -11,9 +11,6 @@
 #define flush(std, c)             \
     while (c != '\n' && c != EOF) \
         c = getc(stdin);
-#define wait()           \
-    int c = getc(stdin); \
-    flush(sdin, c);
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,11 +103,8 @@ void executeProgramm(int pas, Mips *processor)
         processor->PC += 4;
 
         if (pas)
-        {
-            printProgramm(processor);
-            printMemory(processor);
-            printRegisters(processor);
-            wait();
+        {   
+            step(processor);
         }
     }
 }
@@ -263,4 +257,35 @@ void executeInstruction(unsigned int instruction, Mips *processor)
     }
 
     processor->registres[0] = 0;
+}
+
+void step(Mips *processor)
+{
+
+    int c, last;
+    
+   do
+    {
+        fprintf(stdout,"press\nEnter: go next instruction\nm: print memory\np: print program\nr: print register\n");
+        c = getc(stdin);
+        last = c;
+        switch (c)
+        {
+        case 'm':
+            printMemory(processor);
+            break;
+        case 'r':
+            printRegisters(processor);
+            break;
+        case 'p':
+            printProgramm(processor);
+            break;
+        case '\n':
+            break;
+        default:
+            break;
+        }
+        flush(stdin,last);
+        
+    } while (c != '\n' && c != EOF);
 }
