@@ -22,12 +22,12 @@ void mflo(int rd, Mips *processor);
 void jr(int rs, Mips *processor);
 void syscall(int code, Mips *processor);
 
-void bne(int rs, int rt,int offset, Mips *processor);
-void addi(int rs, int rt,int offset, Mips *processor);
-void beq(int rs, int rt,int offset, Mips *processor);
-void bgtz(int rs,int offset, Mips *processor);
-void blez(int rs,int offset, Mips *processor);
-void lui(int rt,int offset, Mips *processor);
+void bne(int rs, int rt, int offset, Mips *processor);
+void addi(int rs, int rt, int offset, Mips *processor);
+void beq(int rs, int rt, int offset, Mips *processor);
+void bgtz(int rs, int offset, Mips *processor);
+void blez(int rs, int offset, Mips *processor);
+void lui(int rt, int offset, Mips *processor);
 
 void sw(int rt, int offset, int base, Mips *processor);
 void lw(int rt, int offset, int base, Mips *processor);

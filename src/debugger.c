@@ -38,7 +38,7 @@ void printProgramm(Mips *processor)
     for (int i = 0; i < processor->programSize; i++)
     {
         //fprintf(stdout, " %08H\t %08H \n", i, processor->text[i]);
-        fprintf(stdout, "%08X\t%08X\n", i<<2, processor->text[i]);
+        fprintf(stdout, "%08X\t%08X\n", i << 2, processor->text[i]);
     }
     fprintf(stdout, "-----------------------------------------------\n");
 }

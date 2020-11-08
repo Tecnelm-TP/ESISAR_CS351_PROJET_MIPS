@@ -20,7 +20,6 @@ struct processor
     Register *memory;
 };
 
-
 struct memRegister
 {
     int registerID;

@@ -169,11 +169,8 @@ int instToHex(Instruction instruction, int *flagErr)
         break;
     }
 
-
-
     return hex;
 }
-
 
 int typeRAParseHEX(Instruction instr, int *flagErr)
 {

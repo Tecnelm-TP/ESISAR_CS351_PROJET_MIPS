@@ -103,7 +103,7 @@ void executeProgramm(int pas, Mips *processor)
         processor->PC += 4;
 
         if (pas)
-        {   
+        {
             step(processor);
         }
     }
@@ -263,10 +263,10 @@ void step(Mips *processor)
 {
 
     int c, last;
-    
-   do
+
+    do
     {
-        fprintf(stdout,"press\nEnter: go next instruction\nm: print memory\np: print program\nr: print register\n");
+        fprintf(stdout, "press\nEnter: go next instruction\nm: print memory\np: print program\nr: print register\n");
         c = getc(stdin);
         last = c;
         switch (c)
@@ -285,7 +285,7 @@ void step(Mips *processor)
         default:
             break;
         }
-        flush(stdin,last);
-        
+        flush(stdin, last);
+
     } while (c != '\n' && c != EOF);
 }

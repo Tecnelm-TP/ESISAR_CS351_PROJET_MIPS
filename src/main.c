@@ -87,9 +87,7 @@ int main(int argc, char *argv[])
         {
             executeInteractiv(&proc);
         }
-        
-    
-    }
+        }
 
     return 0;
 }
