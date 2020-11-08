@@ -73,7 +73,6 @@ void mflo(int rd, Mips *processor)
 void jr(int rs, Mips *processor)
 {
     processor->PC = processor->registres[rs];
-
     fprintf(stdout, "{JR $%d }\n", rs);
 }
 void syscall(int code, Mips *processor)
@@ -82,6 +81,11 @@ void syscall(int code, Mips *processor)
 
 void bne(int rs, int rt, short int offset, Mips *processor)
 {
+    if (processor->registres[rs] != processor->registres[rt])
+    {
+        processor->PC += offset << 2;
+    }
+    fprintf(stdout, "{BNE $%d,$%d,0x%X }\n", rs, rt, offset);
 }
 void addi(int rs, int rt, short int offset, Mips *processor)
 {
@@ -90,12 +94,27 @@ void addi(int rs, int rt, short int offset, Mips *processor)
 }
 void beq(int rs, int rt, short int offset, Mips *processor)
 {
+    if (processor->registres[rs] == processor->registres[rt])
+    {
+        processor->PC += offset << 2;
+    }
+    fprintf(stdout, "{BEQ $%d,$%d,0x%X }\n", rs, rt, offset);
 }
 void bgtz(int rs, short int offset, Mips *processor)
 {
+    if (processor->registres[rs] > 0)
+    {
+        processor->PC += offset << 2;
+    }
+    fprintf(stdout, "{BGTZ $%d,0x%X }\n", rs, offset);
 }
 void blez(int rs, short int offset, Mips *processor)
 {
+    if (processor->registres[rs] <= 0)
+    {
+        processor->PC += offset << 2;
+    }
+    fprintf(stdout, "{BLEZ $%d,0x%X }\n", rs, offset);
 }
 void lui(int rt, short int offset, Mips *processor)
 {
@@ -133,7 +152,12 @@ void lw(int rt, short int offset, int base, Mips *processor)
 
 void jal(int offset, Mips *processor)
 {
+    processor->registres[31] = processor->PC + 8;
+    processor->PC = (processor->PC & 0xf0000000) + offset << 2;
+    fprintf(stdout, "{JAL 0x%X }\n", offset);
 }
 void j(int offset, Mips *processor)
 {
+    processor->PC += offset << 2;
+    fprintf(stdout, "{J 0x%X }\n", offset);
 }
