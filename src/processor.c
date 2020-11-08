@@ -26,17 +26,8 @@ void initialiseMips(Mips *processor, const char *programFolderName)
     int res;
     int PC = 0;
     unsigned int tempVal;
+    initialiseProcessor(processor);
 
-    processor->programSize = programSize;
-    processor->text = malloc(processor->programSize * sizeof(int) / sizeof(char));
-
-    processor->PC = 0;
-    processor->HI = 0;
-    processor->LO = 0;
-    for (int i = 0; i < NBREGISTER; i++)
-    {
-        processor->registres[i] = 0;
-    }
     program = fopen(programFolderName, "r");
     if (program == NULL)
     {
@@ -53,10 +44,6 @@ void initialiseMips(Mips *processor, const char *programFolderName)
         }
     }
     fclose(program);
-    processor->memory = malloc(sizeof(Register) / sizeof(char));
-    processor->memory->next = NULL;
-    processor->memory->registerID = 0;
-    processor->memory->value = 0;
 }
 
 void freeProc(Mips *processor)
@@ -115,6 +102,9 @@ void executeInteractiv(Mips *processor)
     int flagErr;
     int instruction;
     int flagStop = 0;
+    initialiseProcessor(processor);
+    initInstruction(instrL);
+
     fprintf(stdout, "Entering in interactiv mode : EXIT to stop \n");
 
     do
@@ -128,10 +118,29 @@ void executeInteractiv(Mips *processor)
         else
         {
             instruction = parseExpressionStr(line, &flagErr);
-            executeInstruction(instruction, processor);
+            switch (flagErr)
+            {
+            case instrERR_parsed:
+                fprintf(stderr, "%08X\n", instruction);
+                executeInstruction(instruction, processor);
+                break;
+            case instrERR_missing:
+
+                fprintf(stderr, "%s :ERROR INSTRUCTION NOT IMPLEMENTED\n", strtok(line, delimiters));
+                break;
+            case instrERR_blankOrComment_line:
+                fprintf(stderr, "No instruction or comment\n");
+                break;
+            case instrERR_error_parsing:
+                fprintf(stderr, "ERROR PARSING\n");
+                break;
+
+            default:
+                break;
+            }
+            step(processor);
         }
         free(line);
-
     } while (!flagStop);
 }
 void executeInstruction(unsigned int instruction, Mips *processor)
@@ -288,4 +297,24 @@ void step(Mips *processor)
         flush(stdin, last);
 
     } while (c != '\n' && c != EOF);
+}
+
+void initialiseProcessor(Mips *processor)
+{
+
+    processor->programSize = programSize;
+    processor->text = malloc(processor->programSize * sizeof(int) / sizeof(char));
+
+    processor->PC = 0;
+    processor->HI = 0;
+    processor->LO = 0;
+    for (int i = 0; i < NBREGISTER; i++)
+    {
+        processor->registres[i] = 0;
+    }
+
+    processor->memory = malloc(sizeof(Register) / sizeof(char));
+    processor->memory->next = NULL;
+    processor->memory->registerID = 0;
+    processor->memory->value = 0;
 }

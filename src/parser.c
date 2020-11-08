@@ -7,7 +7,7 @@
 #include "opcode.h"
 #include "processor.h"
 
-const char delimiters[] = ", #$\n()";
+const char delimiters[] = ", #$\n()\r";
 int programSize = 0;
 
 int getBeginSpace(const char *line)

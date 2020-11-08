@@ -58,8 +58,13 @@ int main(int argc, char *argv[])
         {
 
             dest = strdup(src);
-
-            strcpy(strrchr(dest, '.') + 1, "hex");
+            char *temp = strrchr(dest, '.');
+            if (temp == NULL)
+            {
+                fprintf(stderr, "ERROR FOLDER SPECIFIED\n");
+                exit(EXIT_FAILURE);
+            }
+            strcpy(temp + 1, "hex");
         }
 
         if (!folderIsHEX)
@@ -68,7 +73,6 @@ int main(int argc, char *argv[])
             parseFolder(src, dest);
         }
 
-        initialiseMips(&proc, folderIsHEX ? src : dest);
         executeProgramm(modePas, &proc);
 
         if (!outputSpecified)
@@ -87,7 +91,7 @@ int main(int argc, char *argv[])
         {
             executeInteractiv(&proc);
         }
-        }
+    }
 
     return 0;
 }

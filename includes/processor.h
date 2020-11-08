@@ -37,5 +37,6 @@ void executeInstruction(unsigned int instruction, Mips *processor);
 void executeProgramm(int pas, Mips *processor);
 void executeInteractiv(Mips *processor);
 void step(Mips *processor);
+void initialiseProcessor(Mips *processor);
 
 #endif // !__PROCESSOR_H__
