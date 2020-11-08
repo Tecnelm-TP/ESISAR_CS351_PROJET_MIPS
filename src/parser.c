@@ -329,10 +329,18 @@ int typeIAParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = atoi(offset) & 0xFFFF;
+        if (offset[0] == '0' && offset[1] == 'x')
+        {
+            offseti = strtol(offset, NULL, 16) & 0xFFFF;
+        }
+        else
+        {
+            offseti = atoi(offset) & 0xFFFF;
+            /* code */
+        }
+
         rti = atoi(rt);
         rsi = atoi(rs);
-        
 
         /* code */
     }
@@ -357,7 +365,15 @@ int typeIBParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = atoi(offset) & 0xFFFF;
+        if (offset[0] == '0' && offset[1] == 'x')
+        {
+            offseti = strtol(offset, NULL, 16) & 0xFFFF;
+        }
+        else
+        {
+            offseti = atoi(offset) & 0xFFFF;
+            /* code */
+        }
         rsi = atoi(rs);
     }
 
@@ -381,8 +397,15 @@ int typeICParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = atoi(offset) & 0xFFFF;
-
+        if (offset[0] == '0' && offset[1] == 'x')
+        {
+            offseti = strtol(offset, NULL, 16) & 0xFFFF;
+        }
+        else
+        {
+            offseti = atoi(offset) & 0xFFFF;
+            /* code */
+        }
     }
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
@@ -407,10 +430,17 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = atoi(offset) & 0xFFFF;
+        if (offset[0] == '0' && offset[1] == 'x')
+        {
+            offseti = strtol(offset, NULL, 16) & 0xFFFF;
+        }
+        else
+        {
+            offseti = atoi(offset) & 0xFFFF;
+            /* code */
+        }
         rti = atoi(rt);
         rsi = atoi(base);
-
     }
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
