@@ -28,10 +28,10 @@ NOP                # rien
 MFLO  $9           # b = q_lo = 6
 XOR   $9, $10,  $9 # b = c xor b = 3276805
 SUB  $10,  $9, $10 # c = b - c = 2
-SLL  $10, $10,   1 # c = c << 1 = 4
+SLL  $10, $10,   1 # c = c << 1 = 4//
 SW    $9, 4($10)   # @00000008 = 3276805
 ADDI $9,$0,1048576 # b = 2^20 = 1048576
-SRL   $9,  $9,   1 # b = b >> 1 = 2^19 = 524288
+SRL   $9,  $9,   1 # b = b >> 1 = 2^19 = 524288//
 ROTR  $8,  $8,  31 # a = rotr(a, 31) = a * 2
 SLT  $10,  $8,  $9 # c = 1 si a < b, 0 sinon
 BGTZ $10,  -2      # if c > 0, goto instruct 2 précédente

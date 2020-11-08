@@ -35,7 +35,7 @@
 #define NBTYPEJ 1
 #define NBTYPEI 4
 
-#define RINTRCODE 0x00003F//0
+#define INTRCODE 0x0000003F//0
 #define SA 0x000007C0  //5
 #define RD 0x0000F800  //11
 #define RT 0x001F0000  //16
@@ -44,7 +44,7 @@
 #define CODE 0x03FFFFC0
 #define INSTRINDEX 0x03FFFFFF
 
-#define IINTRCODE 0xFF0000
+#define IINTRCODE 0xFE000000
 
 
 

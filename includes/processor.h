@@ -4,20 +4,22 @@
 
 typedef struct memRegister Register;
 typedef struct processor Mips;
+extern int programSize;
 struct processor
 {
     unsigned int registres[NBREGISTER];
     int PC;
 
     int HI;
-    int HO;
+    int LO;
+
+    int programSize;
 
     int *text;
 
     Register *memory;
 };
 
-extern int programSize;
 
 struct memRegister
 {

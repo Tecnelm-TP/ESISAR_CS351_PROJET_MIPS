@@ -1,6 +1,6 @@
 #define _GNU_SOURCE
 
-#define getSA(i, sa) sa = (i & SA) >> 5
+#define getSA(i, sa) sa = (i & SA) >> 6
 #define getRD(i, rd) rd = (i & RD) >> 11
 #define getRT(i, rt) rt = (i & RT) >> 16
 #define getRS(i, rs) rs = (i & RS) >> 21
@@ -21,6 +21,7 @@
 #include "processor_operation.h"
 #include "parser.h"
 #include "string.h"
+#include "debugger.h"
 
 void initialiseMips(Mips *processor, const char *programFolderName)
 {
@@ -29,11 +30,12 @@ void initialiseMips(Mips *processor, const char *programFolderName)
     int PC = 0;
     unsigned int tempVal;
 
-    processor->text = malloc(programSize * sizeof(int) / sizeof(char));
+    processor->programSize = programSize;
+    processor->text = malloc(processor->programSize * sizeof(int) / sizeof(char));
 
     processor->PC = 0;
     processor->HI = 0;
-    processor->HO = 0;
+    processor->LO = 0;
     for (int i = 0; i < NBREGISTER; i++)
     {
         processor->registres[i] = 0;
@@ -98,11 +100,16 @@ void addRegister(Mips *processor, int registerID, int value)
 }
 void executeProgramm(int pas, Mips *processor)
 {
-    while (processor->PC != (programSize << 2))
+    while (processor->PC != (processor->programSize << 2))
     {
         executeInstruction((processor->text)[(processor->PC) >> 2], processor);
+        processor->PC += 4;
+
         if (pas)
         {
+            printProgramm(processor);
+            printMemory(processor);
+            printRegisters(processor);
             wait();
         }
     }
@@ -135,7 +142,6 @@ void executeInteractiv(Mips *processor)
 }
 void executeInstruction(unsigned int instruction, Mips *processor)
 {
-    instruction = 0;
     int rs = 0, rd = 0, rt = 0, sa = 0, offset = 0;
 
     if (instruction != 0)
@@ -146,7 +152,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
             getRD(instruction, rd);
             getRT(instruction, rt);
             getCode(instruction, offset);
-            switch (instruction & RINTRCODE)
+            switch (instruction & INTRCODE)
             {
             case ADD:
                 add(rd, rt, rs, processor);
@@ -168,12 +174,15 @@ void executeInstruction(unsigned int instruction, Mips *processor)
                 break;
 
             case ROTR:
+                getSA(instruction, sa);
+
                 if (rs)
                     rotr(rd, rt, sa, processor);
                 else
-                    srl(rs, rt, rs, processor);
+                    srl(rd, rt, sa, processor);
                 break;
             case SLL:
+                getSA(instruction, sa);
                 sll(rd, rt, sa, processor);
                 break;
 
@@ -209,7 +218,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
             getRS(instruction, rs);
             getRT(instruction, rt);
             getOffset(instruction, offset);
-            switch (instruction & IINTRCODE)
+            switch ((instruction >> 26) & INTRCODE)
             {
             case BNE:
                 bne(rs, rt, offset, processor);
@@ -248,4 +257,10 @@ void executeInstruction(unsigned int instruction, Mips *processor)
             }
         }
     }
+    else
+    {
+        fprintf(stdout, "{NOP }\n");
+    }
+
+    processor->registres[0] = 0;
 }
