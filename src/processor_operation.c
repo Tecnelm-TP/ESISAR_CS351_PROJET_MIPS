@@ -34,6 +34,13 @@ void xorf(int rd, int rt, int rs, Mips *processor)
 
 void rotr(int rd, int rt, int sa, Mips *processor)
 {
+    int in = processor->registres[rt];
+    int out = in ;
+    if(sa)
+    {
+        out = in << sa + (((in >>1) &0xEFFFFFFF) >> (31-sa));
+    }
+    processor->registres[rd] = out;
 }
 void sll(int rd, int rt, int sa, Mips *processor)
 {
