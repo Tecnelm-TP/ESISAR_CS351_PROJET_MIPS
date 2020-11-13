@@ -1,7 +1,7 @@
 LANGAGE = C
 EXEC = emul-mips
 DEBUG = yes
-CFLAGS = -Wall -ansi -pedantic -std=c99
+CFLAGS = -Wall -ansi -pedantic -std=c99 
 STATICDEFINE = TEST
 lib = 
 ARGS = -i /mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/tests/in2.txt -o /mnt/c/Users/cleme/Documents/Programation/ESISAR_CS351_PROJET_MIPS/sujet/exemples2019/hexified/in.txt

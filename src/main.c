@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
             initInstruction(instrL);
             parseFolder(src, dest);
         }
+        initialiseMips(&proc,dest);
 
         executeProgramm(modePas, &proc);
 

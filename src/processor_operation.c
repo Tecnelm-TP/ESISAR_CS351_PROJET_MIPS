@@ -18,7 +18,7 @@ void slt(int rd, int rt, int rs, Mips *processor)
 }
 void sub(int rd, int rt, int rs, Mips *processor)
 {
-    processor->registres[rd] = processor->registres[rt] - processor->registres[rs];
+    processor->registres[rd] = processor->registres[rs] - processor->registres[rt];
     fprintf(stdout, "{SUB $%d,$%d,$%d }\n", rd, rs, rt);
 }
 void orf(int rd, int rt, int rs, Mips *processor)
