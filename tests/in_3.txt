@@ -1,3 +1,6 @@
+# FULL TEST PROGRAM MIPS
+# manque J, JAL, JR, SYSCALL
+
 ADDI  $8,  $0,   4 # a = 4
 ADDI  $9,  $0,  10 # b = 10
 ADD   $8,  $8,  $9 # a = a + b = 14
@@ -29,5 +32,3 @@ ADDI $10,  $0,   8 # c = 8
 LW    $8, ($10)    # a = 3276805
 ADDI $8,$8,-1000000 # a -= 1000000
 BLEZ  $8,  -1      # if a < 0, goto instruct précédente
-
-# manque J, JAL, JR, SYSCALL
