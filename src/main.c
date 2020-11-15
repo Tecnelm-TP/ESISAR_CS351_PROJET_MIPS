@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     if (inputSpecified)
     {
-        if (!outputSpecified)
+        if (!outputSpecified && !folderIsHEX)
         {
 
             dest = strdup(src);
@@ -65,7 +65,11 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             strcpy(temp + 1, "hex");
+        }else if (folderIsHEX)
+        {
+            dest = src;
         }
+        
 
         if (!folderIsHEX)
         {
@@ -76,7 +80,7 @@ int main(int argc, char *argv[])
 
         executeProgramm(modePas, &proc);
 
-        if (!outputSpecified)
+        if (!outputSpecified && !folderIsHEX)
         {
             free(dest);
         }
