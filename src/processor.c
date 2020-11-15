@@ -26,14 +26,24 @@ void initialiseMips(Mips *processor, const char *programFolderName)
     int res;
     int PC = 0;
     unsigned int tempVal;
-    initialiseProcessor(processor);
 
+    initialiseProcessor(processor);
     program = fopen(programFolderName, "r");
     if (program == NULL)
     {
         fprintf(stderr, "ERROR OPEN PROGRAMM FOLDER\n");
         exit(1);
     }
+
+    while (!feof(program))
+    {
+        res = fscanf(program, "%X\n", &tempVal);
+        if (res == 1)
+            processor->programSize++;
+    }
+
+    processor->text = malloc(processor->programSize * sizeof(int) / sizeof(char));
+    fseek(program, 0, SEEK_SET);
     while (!feof(program))
     {
         res = fscanf(program, "%X\n", &tempVal);
@@ -50,14 +60,16 @@ void freeProc(Mips *processor)
 {
     Register *current = processor->memory;
     Register *prec;
-    free(processor->text);
+    if (processor->text != NULL)
+        free(processor->text);
     while (current->next != NULL)
     {
         prec = current;
         current = current->next;
         free(prec);
     }
-    free(current);
+    if (current != NULL)
+        free(current);
 }
 Register *getregister(Mips *processor, int registerID)
 {
@@ -87,7 +99,6 @@ void executeProgramm(int pas, Mips *processor)
     while (processor->PC != (processor->programSize << 2))
     {
         executeInstruction((processor->text)[(processor->PC) >> 2], processor);
-        processor->PC += 4;
 
         if (pas)
         {
@@ -146,7 +157,7 @@ void executeInteractiv(Mips *processor)
 void executeInstruction(unsigned int instruction, Mips *processor)
 {
     int rs = 0, rd = 0, rt = 0, sa = 0;
-    
+
     short int offset = 0;
 
     if (instruction != 0)
@@ -304,9 +315,7 @@ void step(Mips *processor)
 void initialiseProcessor(Mips *processor)
 {
 
-    processor->programSize = programSize;
-    processor->text = malloc(processor->programSize * sizeof(int) / sizeof(char));
-
+    processor->programSize = 0;
     processor->PC = 0;
     processor->HI = 0;
     processor->LO = 0;
@@ -314,6 +323,7 @@ void initialiseProcessor(Mips *processor)
     {
         processor->registres[i] = 0;
     }
+    processor->text = NULL;
 
     processor->memory = malloc(sizeof(Register) / sizeof(char));
     processor->memory->next = NULL;

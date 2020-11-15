@@ -8,8 +8,6 @@
 #include "processor.h"
 
 const char delimiters[] = ", #$\n()\r";
-int programSize = 0;
-
 int getBeginSpace(const char *line)
 
 {
@@ -59,7 +57,6 @@ void parseFolder(const char *src, const char *dest)
             if (flag == instrERR_parsed)
             {
                 fprintf(destFile, "%08X\n", resultparse);
-                programSize++;
                 fprintf(stderr, "%08X\n", resultparse);
             }
             else if (flag == instrERR_blankOrComment_line)

@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
             initInstruction(instrL);
             parseFolder(src, dest);
         }
-        initialiseMips(&proc,dest);
+        initialiseMips(&proc, dest);
 
         executeProgramm(modePas, &proc);
 
@@ -80,7 +80,6 @@ int main(int argc, char *argv[])
         {
             free(dest);
         }
-        freeProc(&proc);
     }
     else
     {
@@ -93,6 +92,7 @@ int main(int argc, char *argv[])
             executeInteractiv(&proc);
         }
     }
+    freeProc(&proc);
 
     return 0;
 }

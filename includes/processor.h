@@ -4,7 +4,6 @@
 
 typedef struct memRegister Register;
 typedef struct processor Mips;
-extern int programSize;
 struct processor
 {
     unsigned int registres[NBREGISTER];
