@@ -8,7 +8,7 @@
 #include "processor.h"
 
 const char delimiters[] = ", #$\n()\r";
-Label* labelL;
+Label *labelL;
 
 int getBeginSpace(const char *line)
 
@@ -35,7 +35,7 @@ void parseFolder(const char *src, const char *dest)
     char *opcode;
     labelL = malloc(sizeof(Label) / sizeof(char));
     labelL->name = malloc(sizeof(char));
-    labelL->name = strcpy(labelL->name,"");
+    labelL->name = strcpy(labelL->name, "");
     labelL->next = NULL;
     labelL->value = 0;
     int position = 0;
@@ -92,7 +92,7 @@ void parseFolder(const char *src, const char *dest)
                 parseLine = line;
             }
 
-            resultparse = parseExpressionStr(parseLine, &flag);
+            resultparse = parseExpressionStr(parseLine, &flag,position);
 
             if (flag == instrERR_parsed)
             {
@@ -108,6 +108,7 @@ void parseFolder(const char *src, const char *dest)
     }
     //-----------------------------------------------------------------//
     fseek(srcFile, 0, SEEK_SET);
+    position = 0;
 
     while (!feof(srcFile))
     {
@@ -129,12 +130,13 @@ void parseFolder(const char *src, const char *dest)
             {
                 parseLine = line;
             }
-            resultparse = parseExpressionStr(parseLine, &flag);
+            resultparse = parseExpressionStr(parseLine, &flag, position);
 
             if (flag == instrERR_parsed)
             {
                 fprintf(destFile, "%08X\n", resultparse);
                 fprintf(stderr, "%08X\n", resultparse);
+                position++;
             }
             else if (flag == instrERR_blankOrComment_line)
             {
@@ -158,7 +160,7 @@ void parseFolder(const char *src, const char *dest)
     fclose(srcFile);
     fclose(destFile);
 }
-int parseExpressionStr(char *line, int *flagErr)
+int parseExpressionStr(char *line, int *flagErr, int PC)
 {
     int nbSpacestart = 0;
     char *opcode;
@@ -177,7 +179,7 @@ int parseExpressionStr(char *line, int *flagErr)
             if (!strcmp(opcode, opCodeL[i]))
             {
                 *flagErr = instrERR_parsed;
-                resultparse = instToHex(instrL[i], flagErr);
+                resultparse = instToHex(instrL[i], flagErr,PC);
             }
         }
     }
@@ -188,7 +190,7 @@ int parseExpressionStr(char *line, int *flagErr)
     return resultparse;
 }
 
-int instToHex(Instruction instruction, int *flagErr)
+int instToHex(Instruction instruction, int *flagErr,int PC)
 {
     int hex;
     switch (instruction.mode)
@@ -220,10 +222,10 @@ int instToHex(Instruction instruction, int *flagErr)
         switch (instruction.type)
         {
         case IA:
-            hex = typeIAParseHEX(instruction, flagErr);
+            hex = typeIAParseHEX(instruction, flagErr,PC);
             break;
         case IB:
-            hex = typeIBParseHEX(instruction, flagErr);
+            hex = typeIBParseHEX(instruction, flagErr,PC);
             break;
         case IC:
             hex = typeICParseHEX(instruction, flagErr);
@@ -384,7 +386,7 @@ int typeROtherParseHEX(Instruction instr, int *flagErr)
     ;
 }
 
-int typeIAParseHEX(Instruction instr, int *flagErr)
+int typeIAParseHEX(Instruction instr, int *flagErr, int PC)
 {
     char *rs;
     char *rt;
@@ -397,6 +399,7 @@ int typeIAParseHEX(Instruction instr, int *flagErr)
     rt = strtok(NULL, delimiters);
     rs = strtok(NULL, delimiters);
     offset = strtok(NULL, delimiters);
+    Label *label;
 
     if (rs == NULL || rt == NULL || offset == NULL)
     {
@@ -407,6 +410,10 @@ int typeIAParseHEX(Instruction instr, int *flagErr)
         if (offset[0] == '0' && offset[1] == 'x')
         {
             offseti = strtol(offset, NULL, 16) & 0xFFFF;
+        }
+        else if ((label = searchLabel(offset)) != NULL)
+        {
+            offseti = (label->value - PC)& 0xFFFF;
         }
         else
         {
@@ -422,7 +429,7 @@ int typeIAParseHEX(Instruction instr, int *flagErr)
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
 }
-int typeIBParseHEX(Instruction instr, int *flagErr)
+int typeIBParseHEX(Instruction instr, int *flagErr, int PC)
 {
     char *rs;
     char *offset;
@@ -430,6 +437,7 @@ int typeIBParseHEX(Instruction instr, int *flagErr)
     int rti = 0;
     int rsi = 0;
     int offseti = 0;
+    Label *label;
 
     rs = strtok(NULL, delimiters);
     offset = strtok(NULL, delimiters);
@@ -443,6 +451,10 @@ int typeIBParseHEX(Instruction instr, int *flagErr)
         if (offset[0] == '0' && offset[1] == 'x')
         {
             offseti = strtol(offset, NULL, 16) & 0xFFFF;
+        }
+        else if ((label = searchLabel(offset)) != NULL)
+        {
+            offseti = (label->value - PC)& 0xFFFF;
         }
         else
         {
@@ -564,10 +576,13 @@ int typeJTypeParseHEX(Instruction instr, int *flagErr)
 Label *searchLabel(char *labelname)
 {
     Label *label = labelL;
+    int flag = 1;
 
-    while (strcmp(labelname, label->name) && label != NULL)
+    while (flag && label!= NULL)
     {
-        label = label->next;
+        flag = strcmp(labelname, label->name);
+        if(flag)
+            label = label->next;
     }
 
     return label;

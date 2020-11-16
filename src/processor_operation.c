@@ -204,11 +204,11 @@ void lw(int rt, short int offset, int base, Mips *processor)
 void jal(int offset, Mips *processor)
 {
     processor->registres[31] = processor->PC + 8;
-    processor->PC = (processor->PC & 0xf0000000) + offset << 2;
+    processor->PC = (processor->PC & 0xf0000000) + (offset << 2);
     fprintf(stdout, "{JAL 0x%X }\n", offset);
 }
 void j(int offset, Mips *processor)
 {
-    processor->PC += offset << 2;
+    processor->PC = (processor->PC & 0xf0000000) + (offset << 2);
     fprintf(stdout, "{J 0x%X }\n", offset);
 }

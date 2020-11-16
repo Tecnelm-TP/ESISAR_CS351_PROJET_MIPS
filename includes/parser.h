@@ -35,7 +35,7 @@ extern const int opCodehex[];
 extern const char delimiters[];
 
 void parseFolder(const char *src, const char *dest);
-int parseExpressionStr(char *line, int *flagErr);
+int parseExpressionStr(char *line, int *flagErr,int PC);
 int getBeginSpace(const char *line);
 typedef struct instruction
 {
@@ -61,14 +61,14 @@ int typeRCParseHEX(Instruction instr, int *flagErr);
 int typeRDParseHEX(Instruction instr, int *flagErr);
 int typeROtherParseHEX(Instruction instr, int *flagErr);
 
-int typeIAParseHEX(Instruction instr, int *flagErr);
-int typeIBParseHEX(Instruction instr, int *flagErr);
+int typeIAParseHEX(Instruction instr, int *flagErr,int PC);
+int typeIBParseHEX(Instruction instr, int *flagErr,int PC);
 int typeICParseHEX(Instruction instr, int *flagErr);
 int typeIDParseHEX(Instruction instr, int *flagErr);
 
 int typeJTypeParseHEX(Instruction instr, int *flagErr);
 
-int instToHex(Instruction instruction, int *flagErr);
+int instToHex(Instruction instruction, int *flagErr,int PC);
 void initInstruction(Instruction *instruction);
 void freelabel(Label* label);
 Label* searchLabel(char* labelname);

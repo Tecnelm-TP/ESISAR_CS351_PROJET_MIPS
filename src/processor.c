@@ -128,7 +128,7 @@ void executeInteractiv(Mips *processor)
             flagStop = 1;
         else
         {
-            instruction = parseExpressionStr(line, &flagErr);
+            instruction = parseExpressionStr(line, &flagErr,0);
             switch (flagErr)
             {
             case instrERR_parsed:
