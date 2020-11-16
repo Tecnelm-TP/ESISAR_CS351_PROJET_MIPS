@@ -8,6 +8,8 @@
 #include "processor.h"
 
 const char delimiters[] = ", #$\n()\r";
+Label* labelL;
+
 int getBeginSpace(const char *line)
 
 {
@@ -28,8 +30,22 @@ void parseFolder(const char *src, const char *dest)
     int resultparse;
     int flag = instrERR_missing;
     char *line = NULL;
+    char *parseLine = NULL;
     size_t len = 0;
     char *opcode;
+    labelL = malloc(sizeof(Label) / sizeof(char));
+    labelL->name = malloc(sizeof(char));
+    labelL->name = strcpy(labelL->name,"");
+    labelL->next = NULL;
+    labelL->value = 0;
+    int position = 0;
+
+    Label *last = labelL;
+    Label *lastfill = labelL;
+
+    char *temp1;
+    char *temp2;
+    char *temp3;
 
     srcFile = fopen(src, "r");
     if (srcFile == NULL)
@@ -44,15 +60,76 @@ void parseFolder(const char *src, const char *dest)
         fclose(srcFile);
         exit(1);
     }
+    //-----------------------------------------------------------------------------//
+    while (!feof(srcFile))
+    {
+        line = NULL;
+
+        getline(&line, &len, srcFile);
+
+        temp1 = strchr(line, ':');
+        temp2 = strchr(line, '#');
+
+        if (((temp1 && temp2 && (temp1 < temp2)) || (temp1)))
+        {
+            last->next = malloc(sizeof(Label) / sizeof(char));
+            last = last->next;
+            last->value = 0;
+            last->next = NULL;
+            temp3 = strtok(line, ":");
+            last->name = malloc(sizeof(char) * (strlen(temp3) + 1));
+            strcpy(last->name, temp3);
+        }
+
+        if (line)
+        {
+            if (((temp1 && temp2 && (temp1 < temp2)) || (temp1)))
+            {
+                parseLine = strtok(NULL, "");
+            }
+            else
+            {
+                parseLine = line;
+            }
+
+            resultparse = parseExpressionStr(parseLine, &flag);
+
+            if (flag == instrERR_parsed)
+            {
+                while (lastfill->next != NULL)
+                {
+                    lastfill = lastfill->next;
+                    lastfill->value = position;
+                }
+                position++;
+            }
+            free(line);
+        }
+    }
+    //-----------------------------------------------------------------//
+    fseek(srcFile, 0, SEEK_SET);
 
     while (!feof(srcFile))
     {
         line = NULL;
+
         getline(&line, &len, srcFile);
+
+        temp1 = strchr(line, ':');
+        temp2 = strchr(line, '#');
 
         if (line)
         {
-            resultparse = parseExpressionStr(line, &flag);
+            if (((temp1 && temp2 && (temp1 < temp2)) || (temp1)))
+            {
+                strtok(line, ":");
+                parseLine = strtok(NULL, "");
+            }
+            else
+            {
+                parseLine = line;
+            }
+            resultparse = parseExpressionStr(parseLine, &flag);
 
             if (flag == instrERR_parsed)
             {
@@ -77,6 +154,7 @@ void parseFolder(const char *src, const char *dest)
         }
     }
 
+    freelabel(labelL);
     fclose(srcFile);
     fclose(destFile);
 }
@@ -456,7 +534,7 @@ int typeJTypeParseHEX(Instruction instr, int *flagErr)
 {
     char *instIndex;
     int instIndexI;
-
+    Label *label;
     instIndex = strtok(NULL, delimiters);
 
     if (instIndex == NULL)
@@ -465,10 +543,34 @@ int typeJTypeParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        instIndexI = atoi(instIndex);
+        if (instIndex != NULL)
+        {
+            label = searchLabel(instIndex);
+
+            if (label == NULL)
+            {
+                instIndexI = atoi(instIndex);
+            }
+            else
+            {
+                instIndexI = label->value;
+            }
+        }
     }
 
     return instIndexI + (instr.hexCode << 26);
+}
+
+Label *searchLabel(char *labelname)
+{
+    Label *label = labelL;
+
+    while (strcmp(labelname, label->name) && label != NULL)
+    {
+        label = label->next;
+    }
+
+    return label;
 }
 
 void initInstruction(Instruction *instruction)
@@ -510,6 +612,25 @@ void initInstruction(Instruction *instruction)
             instruction[id].hexCode = opCodehex[id];
             id++;
         }
+    }
+}
+
+void freelabel(Label *label)
+{
+
+    Label *current = label;
+    Label *prec;
+    while (current->next != NULL)
+    {
+        prec = current;
+        current = current->next;
+        free(prec->name);
+        free(prec);
+    }
+    if (current != NULL)
+    {
+        free(current->name);
+        free(current);
     }
 }
 /*

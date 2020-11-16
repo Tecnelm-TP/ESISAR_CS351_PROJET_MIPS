@@ -1,9 +1,12 @@
 # SIMPLE TEST PROGRAM 1
 
 ADDI  $8,  $0,   4 # a = 4
-ADDI  $9,  $0,  10 # b = 10
+label2:
+label:ADDI  $9,  $0,  10 # b = 10
+
 ADD   $8,  $8,  $9 # a = a + b = 14
 ADDI $10,  $0,   4 # c = 4
 DIV   $8, $10      # div a / c
 MFLO  $9           # b = q = 3
 MFHI $10           # c = r = 2
+J label

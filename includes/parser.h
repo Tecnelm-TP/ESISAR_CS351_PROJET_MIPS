@@ -46,6 +46,15 @@ typedef struct instruction
 
 } Instruction;
 
+typedef struct label
+{
+    char* name;
+    int value;
+    struct label* next;
+}Label;
+
+extern Label* labelL;
+
 int typeRAParseHEX(Instruction instr, int *flagErr);
 int typeRBParseHEX(Instruction instr, int *flagErr);
 int typeRCParseHEX(Instruction instr, int *flagErr);
@@ -61,6 +70,8 @@ int typeJTypeParseHEX(Instruction instr, int *flagErr);
 
 int instToHex(Instruction instruction, int *flagErr);
 void initInstruction(Instruction *instruction);
+void freelabel(Label* label);
+Label* searchLabel(char* labelname);
 /*
 extern int NBINSTRUCTION;
 
