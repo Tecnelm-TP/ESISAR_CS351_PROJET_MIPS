@@ -17,7 +17,7 @@ Pour compiler le programme, utilisez la commande make.
 
 il y a deux modes d'exécutions:
 * mode interactif  : Les instructions sont données au fur et à mesure par l'utilisateur. On utilise la commande : emul-mips; 
-* mode non-interactif: Les instruction sont données dans un fichier au format assembleur. On utilise la commande : emul-mips -i chemin-fichier. 
+* mode non-interactif: Les instructions sont données dans un fichier au format assembleur. On utilise la commande : emul-mips -i chemin-fichier. 
 
 Pour lancer le programme il est nécessaire de spécifier quelque paramètre:
 * -o le fichier de sortie du parseur 
