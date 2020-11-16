@@ -26,7 +26,7 @@ Pour lancer le programme il est nécessaire de spécifier quelque paramètre:
 * -h/--help pour afficher toutes les commandes 
 * -p/--pas pour utiliser le mode pas à pas 
 
-Lorsque le mode non-interactif est utilisé, il est possible de renseigner l'argument "-pas"' qui permet d'exécuter l'émulateur en mode pas à pas.
+Lorsque le mode non-interactif est utilisé, il est possible de renseigner l'argument "--pas"' qui permet d'exécuter l'émulateur en mode pas à pas.
 
 
 ## Auteurs
