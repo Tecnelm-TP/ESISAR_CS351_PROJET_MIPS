@@ -105,7 +105,7 @@ void parseFolder(const char *src, const char *dest)
             }
             free(line);
         }
-    }||(str[i]>='A' && str[i]<='F'))
+    }
     //-----------------------------------------------------------------//
     fseek(srcFile, 0, SEEK_SET);
     position = 0;
