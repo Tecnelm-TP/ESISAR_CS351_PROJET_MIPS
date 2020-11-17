@@ -7,7 +7,7 @@
 #include "opcode.h"
 #include "processor.h"
 
-const char delimiters[] = ", #$\n()\r";
+const char delimiters[] = ", #\n()\r";
 Label *labelL;
 
 int getBeginSpace(const char *line)
@@ -92,7 +92,7 @@ void parseFolder(const char *src, const char *dest)
                 parseLine = line;
             }
 
-            resultparse = parseExpressionStr(parseLine, &flag,position);
+            resultparse = parseExpressionStr(parseLine, &flag, position);
 
             if (flag == instrERR_parsed)
             {
@@ -179,7 +179,7 @@ int parseExpressionStr(char *line, int *flagErr, int PC)
             if (!strcmp(opcode, opCodeL[i]))
             {
                 *flagErr = instrERR_parsed;
-                resultparse = instToHex(instrL[i], flagErr,PC);
+                resultparse = instToHex(instrL[i], flagErr, PC);
             }
         }
     }
@@ -190,7 +190,7 @@ int parseExpressionStr(char *line, int *flagErr, int PC)
     return resultparse;
 }
 
-int instToHex(Instruction instruction, int *flagErr,int PC)
+int instToHex(Instruction instruction, int *flagErr, int PC)
 {
     int hex;
     switch (instruction.mode)
@@ -222,10 +222,10 @@ int instToHex(Instruction instruction, int *flagErr,int PC)
         switch (instruction.type)
         {
         case IA:
-            hex = typeIAParseHEX(instruction, flagErr,PC);
+            hex = typeIAParseHEX(instruction, flagErr, PC);
             break;
         case IB:
-            hex = typeIBParseHEX(instruction, flagErr,PC);
+            hex = typeIBParseHEX(instruction, flagErr, PC);
             break;
         case IC:
             hex = typeICParseHEX(instruction, flagErr);
@@ -269,9 +269,23 @@ int typeRAParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        rti = atoi(rt);
-        rdi = atoi(rd);
-        rsi = atoi(rs);
+        if (*rt == '$' && *rd == '$' && *rs == '$')
+        {
+            rsi = searchalias(rs + 1);
+            rsi = rsi == -1 ? atoi(rs + 1) : rsi;
+            rti = searchalias(rt + 1);
+            rti = rti == -1 ? atoi(rt + 1) : rti;
+            rdi = searchalias(rd + 1);
+            rdi = rdi == -1 ? atoi(rd + 1) : rdi;
+
+            if(rsi<0 || rti<0 || rdi<0 ||rsi>31 || rti>31 || rdi>31)
+                *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            *flagErr = instrERR_error_parsing;
+        }
+
         /* code */
     }
 
@@ -298,8 +312,19 @@ int typeRBParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        rdi = atoi(rd);
-        rti = atoi(rt);
+        if (*rt == '$' && *rd == '$')
+        {
+            rti = searchalias(rt + 1);
+            rti = rti == -1 ? atoi(rt + 1) : rti;
+            rdi = searchalias(rd + 1);
+            rdi = rdi == -1 ? atoi(rd + 1) : rdi;
+            if( rti<0 || rdi<0 || rti>31 || rdi>31)
+                *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            *flagErr = instrERR_error_parsing;
+        }
         sai = atoi(sa);
     }
     if (!strcmp(instr.name, "ROTR"))
@@ -328,8 +353,20 @@ int typeRCParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        rti = atoi(rt);
-        rsi = atoi(rs);
+
+        if (*rt == '$' && *rs == '$')
+        {
+            rsi = searchalias(rs + 1);
+            rsi = rsi == -1 ? atoi(rs + 1) : rsi;
+            rti = searchalias(rt + 1);
+            rti = rti == -1 ? atoi(rt + 1) : rti;
+            if(rsi<0 || rti<0 || rsi>31 || rti>31 )
+                *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            *flagErr = instrERR_error_parsing;
+        }
     }
 
     return (rsi << 21) + (rti << 16) + (rdi << 11) + (sai << 6) + instr.hexCode;
@@ -352,7 +389,17 @@ int typeRDParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        rdi = atoi(rd);
+        if (*rd == '$')
+        {
+            rdi = searchalias(rd + 1);
+            rdi = rdi == -1 ? atoi(rd + 1) : rdi;
+            if(rdi<0 ||rdi>31)
+                *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            *flagErr = instrERR_error_parsing;
+        }
     }
     return instr.hexCode + (sai << 6) + (rdi << 11) + (rti << 16) + (rsi << 21);
 }
@@ -378,6 +425,17 @@ int typeROtherParseHEX(Instruction instr, int *flagErr)
         else
         {
             rsi = atoi(rs);
+            if (*rs == '$')
+            {
+                rsi = searchalias(rs + 1);
+                rsi = rsi == -1 ? atoi(rs + 1) : rsi;
+                if(rsi<0 ||rsi>31 )
+                *flagErr = instrERR_error_parsing;
+            }
+            else
+            {
+                *flagErr = instrERR_error_parsing;
+            }
             sai = 0; //replace with hint
         }
     }
@@ -413,16 +471,26 @@ int typeIAParseHEX(Instruction instr, int *flagErr, int PC)
         }
         else if ((label = searchLabel(offset)) != NULL)
         {
-            offseti = (label->value - PC)& 0xFFFF;
+            offseti = (label->value - PC) & 0xFFFF;
         }
         else
         {
             offseti = atoi(offset) & 0xFFFF;
             /* code */
         }
-
-        rti = atoi(rt);
-        rsi = atoi(rs);
+        if (*rt == '$' && *rs == '$')
+        {
+            rsi = searchalias(rs + 1);
+            rsi = rsi == -1 ? atoi(rs + 1) : rsi;
+            rti = searchalias(rt + 1);
+            rti = rti == -1 ? atoi(rt + 1) : rti;
+            if(rsi<0 || rti<0 ||rsi>31 || rti>31 )
+                *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            *flagErr = instrERR_error_parsing;
+        }
 
         /* code */
     }
@@ -454,14 +522,24 @@ int typeIBParseHEX(Instruction instr, int *flagErr, int PC)
         }
         else if ((label = searchLabel(offset)) != NULL)
         {
-            offseti = (label->value - PC)& 0xFFFF;
+            offseti = (label->value - PC) & 0xFFFF;
         }
         else
         {
             offseti = atoi(offset) & 0xFFFF;
             /* code */
         }
-        rsi = atoi(rs);
+        if (*rs == '$')
+        {
+            rsi = searchalias(rs + 1);
+            rsi = rsi == -1 ? atoi(rs + 1) : rsi;
+            if(rsi<0 ||rsi>31 )
+                *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            *flagErr = instrERR_error_parsing;
+        }
     }
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
@@ -492,6 +570,17 @@ int typeICParseHEX(Instruction instr, int *flagErr)
         {
             offseti = atoi(offset) & 0xFFFF;
             /* code */
+        }
+        if (*rt == '$')
+        {
+            rti = searchalias(rt + 1);
+            rti = rti == -1 ? atoi(rt + 1) : rti;
+            if(rti<0 ||rti>31 )
+                *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            *flagErr = instrERR_error_parsing;
         }
     }
 
@@ -526,6 +615,7 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
             offseti = atoi(offset) & 0xFFFF;
             /* code */
         }
+
         if (base[0] == '0' && base[1] == 'x')
         {
             rsi = strtol(base, NULL, 16);
@@ -535,8 +625,18 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
             rsi = atoi(base);
             /* code */
         }
+        if (*rt == '$')
+        {
 
-        rti = atoi(rt);
+            rti = searchalias(rt + 1);
+            rti = rti == -1 ? atoi(rt + 1) : rti;
+            if(rti<0 || rti>31)
+                *flagErr = instrERR_error_parsing;
+        }
+        else
+        {
+            *flagErr = instrERR_error_parsing;
+        }
     }
 
     return (instr.hexCode << 26) + (rsi << 21) + (rti << 16) + (offseti);
@@ -578,10 +678,10 @@ Label *searchLabel(char *labelname)
     Label *label = labelL;
     int flag = 1;
 
-    while (flag && label!= NULL)
+    while (flag && label != NULL)
     {
         flag = strcmp(labelname, label->name);
-        if(flag)
+        if (flag)
             label = label->next;
     }
 
@@ -629,7 +729,17 @@ void initInstruction(Instruction *instruction)
         }
     }
 }
+int searchalias(char *check)
+{
+    int ret = -1;
 
+    for (int i = 0; i < 32 && ret == -1; i++)
+    {
+        if (!strcmp(check, alias[i]))
+            ret = i;
+    }
+    return ret;
+}
 void freelabel(Label *label)
 {
 
@@ -819,3 +929,34 @@ const int typeNbI[] =
 
 int beginModeJ;
 int beginModeI;
+
+const char *alias[] =
+    {
+        "zero",
+        "at",
+        "v0",
+        "v1",
+        "t0",
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5",
+        "t6",
+        "t7",
+        "s0"
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+        "s7",
+        "t8",
+        "t9",
+        "k0",
+        "k1",
+        "gp",
+        "sp",
+        "fp",
+        "ra"};
