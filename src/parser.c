@@ -105,7 +105,7 @@ void parseFolder(const char *src, const char *dest)
             }
             free(line);
         }
-    }
+    }||(str[i]>='A' && str[i]<='F'))
     //-----------------------------------------------------------------//
     fseek(srcFile, 0, SEEK_SET);
     position = 0;
@@ -278,7 +278,7 @@ int typeRAParseHEX(Instruction instr, int *flagErr)
             rdi = searchalias(rd + 1);
             rdi = rdi == -1 ? atoi(rd + 1) : rdi;
 
-            if(rsi<0 || rti<0 || rdi<0 ||rsi>31 || rti>31 || rdi>31)
+            if (rsi < 0 || rti < 0 || rdi < 0 || rsi > 31 || rti > 31 || rdi > 31)
                 *flagErr = instrERR_error_parsing;
         }
         else
@@ -318,7 +318,7 @@ int typeRBParseHEX(Instruction instr, int *flagErr)
             rti = rti == -1 ? atoi(rt + 1) : rti;
             rdi = searchalias(rd + 1);
             rdi = rdi == -1 ? atoi(rd + 1) : rdi;
-            if( rti<0 || rdi<0 || rti>31 || rdi>31)
+            if (rti < 0 || rdi < 0 || rti > 31 || rdi > 31)
                 *flagErr = instrERR_error_parsing;
         }
         else
@@ -360,7 +360,7 @@ int typeRCParseHEX(Instruction instr, int *flagErr)
             rsi = rsi == -1 ? atoi(rs + 1) : rsi;
             rti = searchalias(rt + 1);
             rti = rti == -1 ? atoi(rt + 1) : rti;
-            if(rsi<0 || rti<0 || rsi>31 || rti>31 )
+            if (rsi < 0 || rti < 0 || rsi > 31 || rti > 31)
                 *flagErr = instrERR_error_parsing;
         }
         else
@@ -393,7 +393,7 @@ int typeRDParseHEX(Instruction instr, int *flagErr)
         {
             rdi = searchalias(rd + 1);
             rdi = rdi == -1 ? atoi(rd + 1) : rdi;
-            if(rdi<0 ||rdi>31)
+            if (rdi < 0 || rdi > 31)
                 *flagErr = instrERR_error_parsing;
         }
         else
@@ -429,8 +429,8 @@ int typeROtherParseHEX(Instruction instr, int *flagErr)
             {
                 rsi = searchalias(rs + 1);
                 rsi = rsi == -1 ? atoi(rs + 1) : rsi;
-                if(rsi<0 ||rsi>31 )
-                *flagErr = instrERR_error_parsing;
+                if (rsi < 0 || rsi > 31)
+                    *flagErr = instrERR_error_parsing;
             }
             else
             {
@@ -484,7 +484,7 @@ int typeIAParseHEX(Instruction instr, int *flagErr, int PC)
             rsi = rsi == -1 ? atoi(rs + 1) : rsi;
             rti = searchalias(rt + 1);
             rti = rti == -1 ? atoi(rt + 1) : rti;
-            if(rsi<0 || rti<0 ||rsi>31 || rti>31 )
+            if (rsi < 0 || rti < 0 || rsi > 31 || rti > 31)
                 *flagErr = instrERR_error_parsing;
         }
         else
@@ -533,7 +533,7 @@ int typeIBParseHEX(Instruction instr, int *flagErr, int PC)
         {
             rsi = searchalias(rs + 1);
             rsi = rsi == -1 ? atoi(rs + 1) : rsi;
-            if(rsi<0 ||rsi>31 )
+            if (rsi < 0 || rsi > 31)
                 *flagErr = instrERR_error_parsing;
         }
         else
@@ -575,7 +575,7 @@ int typeICParseHEX(Instruction instr, int *flagErr)
         {
             rti = searchalias(rt + 1);
             rti = rti == -1 ? atoi(rt + 1) : rti;
-            if(rti<0 ||rti>31 )
+            if (rti < 0 || rti > 31)
                 *flagErr = instrERR_error_parsing;
         }
         else
@@ -630,7 +630,7 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
 
             rti = searchalias(rt + 1);
             rti = rti == -1 ? atoi(rt + 1) : rti;
-            if(rti<0 || rti>31)
+            if (rti < 0 || rti > 31)
                 *flagErr = instrERR_error_parsing;
         }
         else
@@ -739,6 +739,34 @@ int searchalias(char *check)
             ret = i;
     }
     return ret;
+}
+
+int isinteger(const char *str)
+{
+    int ret = -1;
+    int len = strlen(str);
+    if (len > 2)
+    {
+        if (str[0] == '0' && str[1] == 'x')
+        {
+            ret = 1;
+            for (int i = 2; i < len && ret == 1; i++)
+            {
+                if (!((str[i] >= '0' && str[i] <= '9') || (str[i] >= 'A' && str[i] <= 'F')))
+                    ret = 0;
+            }
+        }
+    }
+    if (ret == -1)
+    {
+        ret = 1;
+        for (int i = 0; i < len && ret == 1; i++)
+        {
+            if (!((str[i] >= '0' && str[i] <= '9')))
+                ret = 0;
+        }
+    }
+    return ret ==-1 ? 0 : ret;
 }
 void freelabel(Label *label)
 {

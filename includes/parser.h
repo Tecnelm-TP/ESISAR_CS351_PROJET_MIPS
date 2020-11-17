@@ -75,6 +75,8 @@ void freelabel(Label* label);
 Label* searchLabel(char* labelname);
 int searchalias(char* check);
 
+int isinteger(const char* str);
+
 /*
 extern int NBINSTRUCTION;
 
