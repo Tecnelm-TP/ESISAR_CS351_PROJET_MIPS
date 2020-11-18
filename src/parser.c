@@ -71,21 +71,21 @@ void parseFolder(const char *src, const char *dest)
 
         temp1 = strchr(line, ':');
         temp2 = strchr(line, '#');
-        temp3 = strtok(line, ":");
 
-        if ((((temp1 && temp2 && (temp1 < temp2)) || (temp1))))
+        if (((temp1 && temp2 && (temp1 < temp2)) || (temp1)))
         {
             last->next = malloc(sizeof(Label) / sizeof(char));
             last = last->next;
             last->value = 0;
             last->next = NULL;
-            last->name = malloc(sizeof(char) * (strlen(temp1) + 1));
+            temp3 = strtok(line, ":");
+            last->name = malloc(sizeof(char) * (strlen(temp3) + 1));
             strcpy(last->name, temp3);
         }
 
         if (line)
         {
-            if ((((temp1 && temp2 && (temp1 < temp2)) || (temp1))))
+            if (((temp1 && temp2 && (temp1 < temp2)) || (temp1)))
             {
                 parseLine = strtok(NULL, "");
             }
