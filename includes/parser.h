@@ -33,6 +33,7 @@ enum mode_instructionJ
 extern char *opCodeL[];
 extern const int opCodehex[];
 extern const char delimiters[];
+extern const char* alias[];
 
 void parseFolder(const char *src, const char *dest);
 int parseExpressionStr(char *line, int *flagErr,int PC);
@@ -72,6 +73,11 @@ int instToHex(Instruction instruction, int *flagErr,int PC);
 void initInstruction(Instruction *instruction);
 void freelabel(Label* label);
 Label* searchLabel(char* labelname);
+int searchalias(char* check);
+
+int isinteger(const char* str);
+int convertint(const char* str, int* flagerr);
+
 /*
 extern int NBINSTRUCTION;
 
