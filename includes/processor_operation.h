@@ -34,5 +34,6 @@ void lw(int rt, short int offset, int base, Mips *processor);
 
 void jal(int offset, Mips *processor);
 void j(int offset, Mips *processor);
+void nop(Mips *processor);
 
 #endif

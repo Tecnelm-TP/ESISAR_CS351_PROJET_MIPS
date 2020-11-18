@@ -182,7 +182,7 @@ void sw(int rt, short int offset, int base, Mips *processor)
     }
     processor->PC += 4;
 
-    fprintf(stdout, "{SW $%d,0x%X(0x%X)}\n", rt, offset, base);
+    fprintf(stdout, "{SW $%d,0x%X($%d)}\n", rt, offset, base);
 }
 void lw(int rt, short int offset, int base, Mips *processor)
 {
@@ -198,7 +198,7 @@ void lw(int rt, short int offset, int base, Mips *processor)
     }
     processor->PC += 4;
 
-    fprintf(stdout, "{LW $%d,0x%X(0x%X)}\n", rt, offset, base);
+    fprintf(stdout, "{LW $%d,0x%X($%d)}\n", rt, offset, base);
 }
 
 void jal(int offset, Mips *processor)
@@ -211,4 +211,9 @@ void j(int offset, Mips *processor)
 {
     processor->PC = (processor->PC & 0xf0000000) + (offset << 2);
     fprintf(stdout, "{J 0x%X }\n", offset);
+}
+void nop(Mips *processor)
+{
+    fprintf(stdout, "{NOP }\n");
+    processor->PC+=4;
 }

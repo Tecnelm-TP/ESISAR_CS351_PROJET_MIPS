@@ -9,6 +9,7 @@
 
 const char delimiters[] = ", #\n()\r";
 Label *labelL;
+int permissiveMode = 0;
 
 int getBeginSpace(const char *line)
 
@@ -60,6 +61,7 @@ void parseFolder(const char *src, const char *dest)
         fclose(srcFile);
         exit(1);
     }
+    permissiveMode = 1;
     //-----------------------------------------------------------------------------//
     while (!feof(srcFile))
     {
@@ -107,6 +109,7 @@ void parseFolder(const char *src, const char *dest)
         }
     }
     //-----------------------------------------------------------------//
+    permissiveMode = 0;
     fseek(srcFile, 0, SEEK_SET);
     position = 0;
 
@@ -481,11 +484,12 @@ int typeIAParseHEX(Instruction instr, int *flagErr, int PC)
         *flagErr = instrERR_error_parsing;
     }
     else
-    { 
-        label =searchLabel(offset);
-        if(label == NULL)
+    {
+        label = searchLabel(offset);
+        if (label == NULL)
         {
-            offseti = convertint(offset,flagErr) & 0xFFFF;
+            if (!permissiveMode)
+                offseti = convertint(offset, flagErr) & 0xFFFF;
         }
         else
         {
@@ -533,10 +537,12 @@ int typeIBParseHEX(Instruction instr, int *flagErr, int PC)
     }
     else
     {
-        label =searchLabel(offset);
-        if(label == NULL)
+        label = searchLabel(offset);
+        if (label == NULL)
         {
-            offseti = convertint(offset,flagErr) & 0xFFFF;
+            if (!permissiveMode)
+
+                offseti = convertint(offset, flagErr) & 0xFFFF;
         }
         else
         {
@@ -618,7 +624,14 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
     else
     {
         offseti = convertint(offset, flagErr);
-        rsi = convertint(base, flagErr);
+        
+        if(*base == '$')
+        {
+            rsi = convertint(base+1, flagErr);
+        }else
+        {
+            *flagErr = instrERR_error_parsing;
+        }
 
         if (*rt == '$')
         {
@@ -660,7 +673,9 @@ int typeJTypeParseHEX(Instruction instr, int *flagErr)
 
             if (label == NULL)
             {
-                instIndexI = convertint(instIndex, flagErr);
+                if (!permissiveMode)
+
+                    instIndexI = convertint(instIndex, flagErr);
             }
             else
             {
@@ -790,7 +805,7 @@ int isinteger(const char *str)
         ret = 1;
         for (int i = 0; i < len && ret == 1; i++)
         {
-            if (!((str[i] >= '0' && str[i] <= '9')))
+            if (!(((str[i] >= '0' && str[i] <= '9')||(i==0 && str[i]=='-'))))
                 ret = 0;
         }
     }
@@ -1019,5 +1034,4 @@ const char *alias[] =
         "gp",
         "sp",
         "fp",
-        "ra"
-        };
+        "ra"};

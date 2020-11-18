@@ -9,4 +9,6 @@ ADDI $10,  $0,   4 # c = 4
 DIV   $8, $10      # div a / c
 MFLO  $9           # b = q = 3
 MFHI $10           # c = r = 2
-J label
+J label3
+label3:
+NOP

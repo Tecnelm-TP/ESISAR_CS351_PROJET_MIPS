@@ -275,7 +275,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
     }
     else
     {
-        fprintf(stdout, "{NOP }\n");
+        nop(processor);
     }
 
     processor->registres[0] = 0;
