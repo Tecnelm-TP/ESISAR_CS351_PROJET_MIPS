@@ -76,6 +76,7 @@ Label* searchLabel(char* labelname);
 int searchalias(char* check);
 
 int isinteger(const char* str);
+int convertint(const char* str, int* flagerr);
 
 /*
 extern int NBINSTRUCTION;
