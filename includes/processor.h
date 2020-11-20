@@ -14,7 +14,7 @@ struct processor
 
     int programSize;
 
-    int *text;
+    unsigned int *text;
 
     Register *memory;
 };

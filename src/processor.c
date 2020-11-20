@@ -42,7 +42,7 @@ void initialiseMips(Mips *processor, const char *programFolderName)
             processor->programSize++;
     }
 
-    processor->text = malloc(processor->programSize * sizeof(int) / sizeof(char));
+    processor->text = malloc(processor->programSize * sizeof(unsigned int) / sizeof(char));
     fseek(program, 0, SEEK_SET);
     while (!feof(program))
     {

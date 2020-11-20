@@ -171,10 +171,10 @@ void lui(int rt, short int offset, Mips *processor)
 
 void sw(int rt, short int offset, int base, Mips *processor)
 {
-    Register *reg = getregister(processor, processor->registres[base] + offset);
+    Register *reg = getregister(processor, processor->registres[base] + (offset>>2));
     if (reg == NULL)
     {
-        addRegister(processor, processor->registres[base] + offset, processor->registres[rt]);
+        addRegister(processor, processor->registres[base] +( offset>>2), processor->registres[rt]);
     }
     else
     {
@@ -186,10 +186,10 @@ void sw(int rt, short int offset, int base, Mips *processor)
 }
 void lw(int rt, short int offset, int base, Mips *processor)
 {
-    Register *reg = getregister(processor, processor->registres[base] + offset);
+    Register *reg = getregister(processor, processor->registres[base] + (offset >> 2));
     if (reg == NULL)
     {
-        addRegister(processor, processor->registres[base] + offset, 0);
+        addRegister(processor, processor->registres[base] + (offset>>2), 0);
         processor->registres[rt] = 0;
     }
     else
