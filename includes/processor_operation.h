@@ -2,6 +2,7 @@
 #define __PROCESSOR_OPERATION_H__
 #include "processor.h"
 
+// fonctions relatives aux instructions MIPS
 void add(int rd, int rt, int rs, Mips *processor);
 void andf(int rd, int rt, int rs, Mips *processor);
 void slt(int rd, int rt, int rs, Mips *processor);
