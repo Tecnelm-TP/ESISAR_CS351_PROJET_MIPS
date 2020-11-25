@@ -4,6 +4,7 @@
 
 // def structure processeur MIPS
 typedef struct processor Mips;
+typedef struct memRegister Register;
 struct processor
 {
     unsigned int registres[NBREGISTER];
@@ -16,7 +17,7 @@ struct processor
 };
 
 // def élément mémoire
-typedef struct memRegister Register;
+
 struct memRegister
 {
     int registerID;
