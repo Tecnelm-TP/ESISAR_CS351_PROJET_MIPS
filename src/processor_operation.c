@@ -174,7 +174,7 @@ void sw(int rt, short int offset, int base, Mips *processor)
     Register *reg = getregister(processor, processor->registres[base] + (offset>>2));
     if (reg == NULL)
     {
-        addRegister(processor, processor->registres[base] +( offset>>2), processor->registres[rt]);
+        addRegister(processor, processor->registres[base] +( offset), processor->registres[rt]);
     }
     else
     {
@@ -186,10 +186,10 @@ void sw(int rt, short int offset, int base, Mips *processor)
 }
 void lw(int rt, short int offset, int base, Mips *processor)
 {
-    Register *reg = getregister(processor, processor->registres[base] + (offset >> 2));
+    Register *reg = getregister(processor, processor->registres[base] + (offset));
     if (reg == NULL)
     {
-        addRegister(processor, processor->registres[base] + (offset>>2), 0);
+        addRegister(processor, processor->registres[base] + (offset), 0);
         processor->registres[rt] = 0;
     }
     else
@@ -203,8 +203,8 @@ void lw(int rt, short int offset, int base, Mips *processor)
 
 void jal(int offset, Mips *processor)
 {
-    processor->registres[31] = processor->PC + 8;
-    processor->PC = (processor->PC & 0xf0000000) + (offset << 2);
+    processor->registres[31] = processor->PC + 4;
+    processor->PC = (processor->PC & 0xf0000000) + (offset);
     fprintf(stdout, "{JAL 0x%X }\n", offset);
 }
 void j(int offset, Mips *processor)
@@ -214,6 +214,6 @@ void j(int offset, Mips *processor)
 }
 void nop(Mips *processor)
 {
-    fprintf(stdout, "{NOP }\n");
+    fprintf(stdout, "{NOP}\n");
     processor->PC+=4;
 }

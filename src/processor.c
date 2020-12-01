@@ -8,10 +8,6 @@
 #define getCode(i, offset) offset = (i & CODE) >> 6
 #define getinstr_index(i, offset) offset = (i & INSTRINDEX)
 
-#define flush(std, c)             \
-    while (c != '\n' && c != EOF) \
-        c = getc(stdin);
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "processor.h"
@@ -49,10 +45,11 @@ void initialiseMips(Mips *processor, const char *programFolderName)
         res = fscanf(program, "%X\n", &tempVal);
         if (res == 1)
         {
-            fprintf(stdout, "%08X\t%08X\n", PC << 2, tempVal);
             processor->text[PC++] = tempVal;
         }
     }
+
+    printProgramm(processor);
     fclose(program);
 }
 
@@ -281,36 +278,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
     processor->registres[0] = 0;
 }
 
-void step(Mips *processor)
-{
 
-    int c, last;
-
-    do
-    {
-        fprintf(stdout, "press\nEnter: go next instruction\nm: print memory\np: print program\nr: print register\n");
-        c = getc(stdin);
-        last = c;
-        switch (c)
-        {
-        case 'm':
-            printMemory(processor);
-            break;
-        case 'r':
-            printRegisters(processor);
-            break;
-        case 'p':
-            printProgramm(processor);
-            break;
-        case '\n':
-            break;
-        default:
-            break;
-        }
-        flush(stdin, last);
-
-    } while (c != '\n' && c != EOF);
-}
 
 void initialiseProcessor(Mips *processor)
 {

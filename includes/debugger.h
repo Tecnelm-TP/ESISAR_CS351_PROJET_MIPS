@@ -6,5 +6,7 @@
 void printRegisters(Mips *processor);
 void printMemory(Mips *processor);
 void printProgramm(Mips *processor);
+void step(Mips *processor);
+
 
 #endif // !__DEBUGGER_H__
