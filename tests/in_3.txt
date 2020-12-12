@@ -10,7 +10,7 @@ ADDI  $8,  $8,   1 # a++
 BNE   $8,  $9,  -1 # if (a != b), goto instruct précédente
 ADDI $10,  $0,   4 # c = 4
 DIV   $8, $10      # div a / c
-MFLO  $9           # b = q = 3
+MFLO  $9           # b = q = 2
 MFHI $10           # c = r = 2
 MULT $10,  $9      # mult c * b
 MFHI $10           # c = q_hi

@@ -616,6 +616,10 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
     rt = strtok(NULL, delimiters);
     offset = strtok(NULL, delimiters);
     base = strtok(NULL, delimiters);
+     if(*offset == '$')
+    {
+        base = offset;
+    }
 
     if (base == NULL || rt == NULL || offset == NULL)
     {
@@ -623,7 +627,15 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        offseti = convertint(offset, flagErr);
+        if(*offset == '$')
+        {
+            offseti = 0;
+        }else
+        {
+            /* code */
+            offseti = convertint(offset, flagErr);
+        }
+        
         
         if(*base == '$')
         {
