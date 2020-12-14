@@ -13,17 +13,17 @@ void printRegisters(Mips *processor)
 {
     fprintf(stdout, "-----------------------------------------------\n");
 
-    for (int i = 0; i < NBREGISTER; i+=3)
+    for (int i = 0; i < NBREGISTER; i+=4)
     {
-        fprintf(stdout, "$r%d\t=\t%d\t", i, processor->registres[i]);
-        fprintf(stdout, "$r%d\t=\t%d\t", i+1, processor->registres[i+1]);
-        if(i+2!=32)
-        fprintf(stdout, "$r%d\t=\t%d\n", i+2, processor->registres[i+2]);
+        fprintf(stdout, "$r%d = %d \t", i, processor->registres[i]);
+        fprintf(stdout, "$r%d = %d \t", i+1, processor->registres[i+1]);
+        fprintf(stdout, "$r%d = %d \t", i+2, processor->registres[i+2]);
+        fprintf(stdout, "$r%d = %d\n", i+3, processor->registres[i+3]);
     }
     fprintf(stdout, "\n\n");
-    fprintf(stdout, "HI\t=\t%d\t", processor->HI);
-    fprintf(stdout, "$LO\t=\t%d\t", processor->LO);
-    fprintf(stdout, "$PC\t=\t%d\n", processor->PC);
+    fprintf(stdout, "HI = %d \t", processor->HI);
+    fprintf(stdout, "$LO = %d \t", processor->LO);
+    fprintf(stdout, "$PC = %d \n", processor->PC);
 
     fprintf(stdout, "-----------------------------------------------\n");
 }

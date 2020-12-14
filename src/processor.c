@@ -102,6 +102,10 @@ void executeProgramm(int pas, Mips *processor)
             step(processor);
         }
     }
+    fprintf(stdout, "-----------------------------------------------\n");
+    fprintf(stdout,"Fin du programs \n");
+    step(processor);
+
 }
 void executeInteractiv(Mips *processor)
 {
@@ -249,7 +253,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
                 blez(rs, offset, processor);
                 break;
             case LUI:
-                lui(rs, offset, processor);
+                lui(rt, offset, processor);
                 break;
             case SW:
                 sw(rt, offset, rs, processor);

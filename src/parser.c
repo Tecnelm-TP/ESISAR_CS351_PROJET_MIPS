@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/dir.h>
+#include <ctype.h>
 #include "parser.h"
 #include "opcode.h"
 #include "processor.h"
@@ -169,6 +170,7 @@ int parseExpressionStr(char *line, int *flagErr, int PC)
     char *opcode;
     int resultparse = 0;
     *flagErr = instrERR_missing;
+    char *temp;
 
     nbSpacestart = getBeginSpace(line);
 
@@ -176,6 +178,12 @@ int parseExpressionStr(char *line, int *flagErr, int PC)
 
     if (opcode != NULL && *(line + nbSpacestart) != '\n' && *(line + nbSpacestart) != '#')
     {
+        temp = opcode;
+        while (*temp)
+        {
+            *temp = toupper((unsigned char)*temp);
+            temp++;
+        }
 
         for (int i = 0; i < NB_INSTRUCTION && !*flagErr; i++)
         {
@@ -461,7 +469,7 @@ int typeROtherParseHEX(Instruction instr, int *flagErr)
     }
 
     return instr.hexCode + (sai << 6) + (rdi << 11) + (rti << 16) + (rsi << 21);
-    ;
+    
 }
 
 int typeIAParseHEX(Instruction instr, int *flagErr, int PC)
@@ -616,7 +624,7 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
     rt = strtok(NULL, delimiters);
     offset = strtok(NULL, delimiters);
     base = strtok(NULL, delimiters);
-     if(*offset == '$')
+    if (*offset == '$')
     {
         base = offset;
     }
@@ -627,20 +635,21 @@ int typeIDParseHEX(Instruction instr, int *flagErr)
     }
     else
     {
-        if(*offset == '$')
+        if (*offset == '$')
         {
             offseti = 0;
-        }else
+        }
+        else
         {
             /* code */
             offseti = convertint(offset, flagErr);
         }
-        
-        
-        if(*base == '$')
+
+        if (*base == '$')
         {
-            rsi = convertint(base+1, flagErr);
-        }else
+            rsi = convertint(base + 1, flagErr);
+        }
+        else
         {
             *flagErr = instrERR_error_parsing;
         }
@@ -817,7 +826,7 @@ int isinteger(const char *str)
         ret = 1;
         for (int i = 0; i < len && ret == 1; i++)
         {
-            if (!(((str[i] >= '0' && str[i] <= '9')||(i==0 && str[i]=='-'))))
+            if (!(((str[i] >= '0' && str[i] <= '9') || (i == 0 && str[i] == '-'))))
                 ret = 0;
         }
     }
@@ -841,71 +850,6 @@ void freelabel(Label *label)
         free(current);
     }
 }
-/*
-int NBINSTRUCTION = 1;
-void V2(const char *path,Instruction** instructionL)
-{
-    FILE* instr ;
-   unsigned int mode;
-    unsigned int type;
-    char* name;
-    unsigned int code;
-    int res;
-    int cnt = 0;
-    
-
-    instr = fopen(path,"r");
-    if(instr == NULL){
-        fprintf(stderr,"ERROR OPEN FOLDER\n");
-        exit(EXIT_FAILURE);
-    }
-
-    name = malloc(sizeof(char)*MAXCHARINSTR /sizeof(char));
-    while (!feof(instr))
-    {
-
-        res = fscanf(instr,"%s %X %X %X\n",name,&code,&mode,&type);
-        if(res>0)
-        {
-            NBINSTRUCTION++;
-        }
-        
-    }
-    free(name);
-    fseek(instr,0,SEEK_SET);
-    *instructionL = malloc(sizeof(Instruction)*NBINSTRUCTION/sizeof(char));
-
-    while (!feof(instr))
-    {
-        name = malloc(sizeof(char)*MAXCHARINSTR /sizeof(char));
-        res = fscanf(instr,"%s %X %X %X\n",name,&code,&mode,&type);
-        if(res>0)
-        {
-            (*instructionL)[cnt].hexCode = code;
-            (*instructionL)[cnt].name = name;
-            (*instructionL)[cnt].type = type;
-            (*instructionL)[cnt++].mode = mode;
-        }else
-        {
-            free(name);
-        }
-        
-    }
-    
-
-
-
-    fclose(instr);
-
-}
-void freeV2(Instruction* instr)
-{
-    for(int i = 0 ; i<NBINSTRUCTION ; i++)
-    {
-        free((instr)[i].name);
-    }
-    free(instr);
-}*/
 
 char *opCodeL[] = {
     "ADD",
@@ -1046,5 +990,4 @@ const char *alias[] =
         "gp",
         "sp",
         "fp",
-        "ra"
-        };
+        "ra"};

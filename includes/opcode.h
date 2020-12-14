@@ -20,7 +20,7 @@
 #define JAL 0x3
 #define J 0x2
 #define ROTR 0x2
-#define JR 0x04
+#define JR 0x08
 #define SYSCALL 0xC
 #define BGTZ 0x7
 #define BNE 0x5
@@ -44,7 +44,7 @@
 #define CODE 0x03FFFFC0
 #define INSTRINDEX 0x03FFFFFF
 
-#define IINTRCODE 0xFE000000
+#define IINTRCODE 0xFC000000
 
 extern const int typeNbR[NBTYPER];
 extern const int typeNbJ[NBTYPEJ];

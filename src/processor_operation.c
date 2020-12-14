@@ -21,7 +21,9 @@ void slt(int rd, int rt, int rs, Mips *processor)
 }
 void sub(int rd, int rt, int rs, Mips *processor)
 {
-    processor->registres[rd] = processor->registres[rs] - processor->registres[rt];
+    if(processor->registres[rs] > processor->registres[rt])
+        processor->registres[rd] = processor->registres[rs] - processor->registres[rt];
+
     processor->PC += 4;
     fprintf(stdout, "{SUB $%d,$%d,$%d }\n", rd, rs, rt);
 }
@@ -41,7 +43,7 @@ void xorf(int rd, int rt, int rs, Mips *processor)
 void rotr(int rd, int rt, int sa, Mips *processor)
 {
 
-    processor->registres[rd] = (processor->registres[rt] << sa) + (processor->registres[rt] >> (32 - sa));
+    processor->registres[rd] = (processor->registres[rt] >> sa) | (processor->registres[rt] << (32 - sa));
     processor->PC += 4;
 
     fprintf(stdout, "{ROTR $%d,$%d,0X%0X }\n", rd, rt, sa);
@@ -70,7 +72,7 @@ void divf(int rt, int rs, Mips *processor)
 }
 void mult(int rt, int rs, Mips *processor)
 {
-    long result = processor->registres[rs] * processor->registres[rt];
+    long long result = processor->registres[rs] * processor->registres[rt];
     processor->HI = (result >> 32) & 0xFFFFFFFF;
     processor->LO = result & 0xFFFFFFFF;
     processor->PC += 4;
@@ -163,7 +165,7 @@ void blez(int rs, short int offset, Mips *processor)
 }
 void lui(int rt, short int offset, Mips *processor)
 {
-    processor->registres[rt] = offset << 16;
+    processor->registres[rt] = (offset << 16) | (processor->registres[rt] & 0x0000FFFF) ;
     processor->PC += 4;
 
     fprintf(stdout, "{LUI %d,0x%X}\n", rt, offset);
@@ -204,7 +206,7 @@ void lw(int rt, short int offset, int base, Mips *processor)
 void jal(int offset, Mips *processor)
 {
     processor->registres[31] = processor->PC + 4;
-    processor->PC = (processor->PC & 0xf0000000) + (offset);
+    processor->PC = (processor->PC & 0xf0000000) + (offset<<2);
     fprintf(stdout, "{JAL 0x%X }\n", offset);
 }
 void j(int offset, Mips *processor)
