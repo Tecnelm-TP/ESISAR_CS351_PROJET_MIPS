@@ -2,13 +2,13 @@
 #define __PROCESSOR_OPERATION_H__
 #include "processor.h"
 
-// fonctions relatives aux instructions MIPS
+// fonctions relatives aux instructions MIPS se referer a la documentation 
 void add(int rd, int rt, int rs, Mips *processor);
-void andf(int rd, int rt, int rs, Mips *processor);
+void andf(int rd, int rt, int rs, Mips *processor);// et logique 
 void slt(int rd, int rt, int rs, Mips *processor);
 void sub(int rd, int rt, int rs, Mips *processor);
-void orf(int rd, int rt, int rs, Mips *processor);
-void xorf(int rd, int rt, int rs, Mips *processor);
+void orf(int rd, int rt, int rs, Mips *processor); // ou logique 
+void xorf(int rd, int rt, int rs, Mips *processor);// xor logique 
 
 void rotr(int rd, int rt, int sa, Mips *processor);
 void sll(int rd, int rt, int sa, Mips *processor);

@@ -35,15 +35,15 @@ void parseFolder(const char *src, const char *dest)
     char *parseLine = NULL;
     size_t len = 0;
     char *opcode;
-    labelL = malloc(sizeof(Label) / sizeof(char));
+    labelL = malloc(sizeof(Label) / sizeof(char)); /// alocation de la liste chaîné des labels 
     labelL->name = malloc(sizeof(char));
     labelL->name = strcpy(labelL->name, "");
     labelL->next = NULL;
     labelL->value = 0;
     int position = 0;
 
-    Label *last = labelL;
-    Label *lastfill = labelL;
+    Label *last = labelL; /// position du dernier label, pour rapidement rajouter un label
+    Label *lastfill = labelL;/// position du dernier label rempli avec une position  
 
     char *temp1;
     char *temp2;
@@ -64,6 +64,7 @@ void parseFolder(const char *src, const char *dest)
     }
     permissiveMode = 1;
     //-----------------------------------------------------------------------------//
+    // première lecture du fichier afin de détecter les labels 
     while (!feof(srcFile))
     {
         line = NULL;
@@ -73,9 +74,9 @@ void parseFolder(const char *src, const char *dest)
         temp1 = strchr(line, ':');
         temp2 = strchr(line, '#');
 
-        if (((temp1 && temp2 && (temp1 < temp2)) || (temp1)))
+        if (((temp1 && temp2 && (temp1 < temp2)) || (temp1))) /// detection si le label se trouve avant ou après un caractère de commentaire 
         {
-            last->next = malloc(sizeof(Label) / sizeof(char));
+            last->next = malloc(sizeof(Label) / sizeof(char));/// creation du label 
             last = last->next;
             last->value = 0;
             last->next = NULL;
@@ -99,6 +100,7 @@ void parseFolder(const char *src, const char *dest)
 
             if (flag == instrERR_parsed)
             {
+                /// dans le cas ou une instruction à bien été parsé alors on rempli tous les labels vers la position sur laquel il pointe     
                 while (lastfill->next != NULL)
                 {
                     lastfill = lastfill->next;
@@ -110,8 +112,8 @@ void parseFolder(const char *src, const char *dest)
         }
     }
     //-----------------------------------------------------------------//
-    permissiveMode = 0;
-    fseek(srcFile, 0, SEEK_SET);
+    permissiveMode = 0; 
+    fseek(srcFile, 0, SEEK_SET); /// on retourne en haut du fichier
     position = 0;
 
     while (!feof(srcFile))
@@ -125,7 +127,7 @@ void parseFolder(const char *src, const char *dest)
 
         if (line)
         {
-            if (((temp1 && temp2 && (temp1 < temp2)) || (temp1)))
+            if (((temp1 && temp2 && (temp1 < temp2)) || (temp1))) /// supprésion des labels en début de ligne 
             {
                 strtok(line, ":");
                 parseLine = strtok(NULL, "");
@@ -138,7 +140,7 @@ void parseFolder(const char *src, const char *dest)
 
             if (flag == instrERR_parsed)
             {
-                fprintf(destFile, "%08X\n", resultparse);
+                fprintf(destFile, "%08X\n", resultparse);/// ecriture dans le fichier de destination l'instruction en hexadecimal
                 fprintf(stderr, "%08X\n", resultparse);
                 position++;
             }
@@ -181,13 +183,13 @@ int parseExpressionStr(char *line, int *flagErr, int PC)
         temp = opcode;
         while (*temp)
         {
-            *temp = toupper((unsigned char)*temp);
+            *temp = toupper((unsigned char)*temp); /// transforme l'instruction en majuscule 
             temp++;
         }
 
         for (int i = 0; i < NB_INSTRUCTION && !*flagErr; i++)
         {
-            if (!strcmp(opcode, opCodeL[i]))
+            if (!strcmp(opcode, opCodeL[i]))/// cherche quel instruction a été appelé 
             {
                 *flagErr = instrERR_parsed;
                 resultparse = instToHex(instrL[i], flagErr, PC);
@@ -204,6 +206,7 @@ int parseExpressionStr(char *line, int *flagErr, int PC)
 int instToHex(Instruction instruction, int *flagErr, int PC)
 {
     int hex;
+    /// cherche le type de l'instruction a parser   
     switch (instruction.mode)
     {
     case R:
@@ -274,15 +277,15 @@ int typeRAParseHEX(Instruction instr, int *flagErr)
     rs = strtok(NULL, delimiters);
     rt = strtok(NULL, delimiters);
 
-    if (rd == NULL || rs == NULL || rt == NULL)
+    if (rd == NULL || rs == NULL || rt == NULL) /// vérification que toutes les valeurs ont pu être récupéré 
     {
         *flagErr = instrERR_error_parsing;
     }
     else
     {
-        if (*rt == '$' && *rd == '$' && *rs == '$')
+        if (*rt == '$' && *rd == '$' && *rs == '$') /// vérification que le format est bon 
         {
-
+            //tente de les convertir en entier si impossible alors lève une erreur de parsing 
             rsi = searchalias(rs + 1);
             if (rsi == -1)
                 rsi = convertint(rs + 1, flagErr);
@@ -728,11 +731,11 @@ int convertint(const char *str, int *flagerr)
     int res = 0;
     int len = strlen(str);
 
-    if (isinteger(str))
+    if (isinteger(str)) /// vérifier qu'il s'agit bien d'un entier 
     {
         if (len > 2)
         {
-            if (str[0] == '0' && str[1] == 'x')
+            if (str[0] == '0' && str[1] == 'x') /// vérification si on est en hexa fait la convertion en accord 
             {
                 res = strtol(str, NULL, 16) & 0xFFFF;
             }
@@ -752,7 +755,7 @@ int convertint(const char *str, int *flagerr)
     return res;
 }
 
-void initInstruction(Instruction *instruction)
+void initInstruction(Instruction *instruction) /// initalisation du tableau d'instruction avec les informations essentiel 
 {
     int i;
     int id = 0;
@@ -793,7 +796,7 @@ void initInstruction(Instruction *instruction)
         }
     }
 }
-int searchalias(char *check)
+int searchalias(char *check) /// regarde si la chaine de caractère est un alias, ou non reviens a quoi correspond l'alias 
 {
     int ret = -1;
 
@@ -811,12 +814,12 @@ int isinteger(const char *str)
     int len = strlen(str);
     if (len > 2)
     {
-        if (str[0] == '0' && str[1] == 'x')
+        if (str[0] == '0' && str[1] == 'x') /// regarde s'il est possible que ce soit de l'hexa 
         {
             ret = 1;
             for (int i = 2; i < len && ret == 1; i++)
             {
-                if (!((str[i] >= '0' && str[i] <= '9') || (str[i] >= 'A' && str[i] <= 'F')))
+                if (!((str[i] >= '0' && str[i] <= '9') || (str[i] >= 'A' && str[i] <= 'F'))) /// vérifiaction que chaque caractère soit correct 
                     ret = 0;
             }
         }

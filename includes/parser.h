@@ -32,16 +32,17 @@ enum mode_instructionJ
     Jtype
 };
 
-extern char *opCodeL[];
-extern const int opCodehex[];
-extern const char delimiters[];
-extern const char* alias[];
+extern char *opCodeL[];/// nom des instructions 
+extern const int opCodehex[];/// valeur hexa décimal des instructions
+extern const char delimiters[];// liste des delimiter pour le parsing 
+extern const char* alias[]; // tableau contenant les alias des registres du processeur 
 
 // parse l'ensemble des sources d'un dossier
 void parseFolder(const char *src, const char *dest);
 // parse une instruction assembleur
 int parseExpressionStr(char *line, int *flagErr,int PC);
-// retourne l'indice du premier caractère autre que espace de la chaîne
+
+// retourne l'indice du premier caractère autre qu'un espace
 int getBeginSpace(const char *line);
 
 // def structure Instruction
@@ -80,10 +81,10 @@ int typeJTypeParseHEX(Instruction instr, int *flagErr);
 
 // converti une instruction en son équivalent hexadécimal
 int instToHex(Instruction instruction, int *flagErr,int PC);
-// initialise une instruction
+// initialise les tableaux d'instruction
 void initInstruction(Instruction *instruction);
 
-// supprime un label
+// libère la liste chaîné des labels 
 void freelabel(Label* label);
 // recherche un label dans la liste chaînée
 Label* searchLabel(char* labelname);
@@ -91,12 +92,12 @@ Label* searchLabel(char* labelname);
 // cherche la correspondance avec l'alias des registres d'usage général
 int searchalias(char* check);
 
-// teste si la chaine contient un entier en décimal ou hexadécimal
+// teste si la chaine es un entier en décimal ou hexadécimal
 int isinteger(const char* str);
 // converti la chaîne en entier
 int convertint(const char* str, int* flagerr);
 
-Instruction instrL[NB_INSTRUCTION];
+Instruction instrL[NB_INSTRUCTION];// tableau contenant toutes les instructions 
 
 // def type erreur
 enum instrERR

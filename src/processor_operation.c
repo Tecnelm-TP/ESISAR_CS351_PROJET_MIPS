@@ -21,7 +21,7 @@ void slt(int rd, int rt, int rs, Mips *processor)
 }
 void sub(int rd, int rt, int rs, Mips *processor)
 {
-    if (processor->registres[rs] > processor->registres[rt])
+    if (processor->registres[rs] > processor->registres[rt]) /// verification qu'il n'y a pas d'overflow 
         processor->registres[rd] = processor->registres[rs] - processor->registres[rt];
 
     processor->PC += 4;
@@ -102,6 +102,7 @@ void jr(int rs, Mips *processor)
 }
 void syscall(int code, Mips *processor)
 {
+    fprintf(stdout, "{Sycall %d }\n", code);
 }
 
 void bne(int rs, int rt, short int offset, Mips *processor)

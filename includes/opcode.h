@@ -35,6 +35,9 @@
 #define NBTYPEJ 1
 #define NBTYPEI 4
 
+/**
+ * Ces defines sont des masques permettant de récupérér les valeurs dans une chaîne hexadécimal
+ * */
 #define INTRCODE 0x0000003F //0
 #define SA 0x000007C0       //5
 #define RD 0x0000F800       //11
@@ -43,13 +46,18 @@
 #define OFFSET 0x0000FFFF
 #define CODE 0x03FFFFC0
 #define INSTRINDEX 0x03FFFFFF
-
 #define IINTRCODE 0xFC000000
 
+/**
+ * ce sont des tableau contenant le nombre d'instruction de chaque sous type de type
+ * */
 extern const int typeNbR[NBTYPER];
 extern const int typeNbJ[NBTYPEJ];
 extern const int typeNbI[NBTYPEI];
 
+/**
+ * valeur des instrctuin ou commence le monde J et I
+ * */
 extern int beginModeJ;
 extern int beginModeI;
 

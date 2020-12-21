@@ -30,7 +30,7 @@ void initialiseMips(Mips *processor, const char *programFolderName)
         fprintf(stderr, "ERROR OPEN PROGRAMM FOLDER\n");
         exit(1);
     }
-
+/// calcule de la taille de la section texte
     while (!feof(program))
     {
         res = fscanf(program, "%X\n", &tempVal);
@@ -40,6 +40,7 @@ void initialiseMips(Mips *processor, const char *programFolderName)
 
     processor->text = malloc(processor->programSize * sizeof(unsigned int) / sizeof(char));
     fseek(program, 0, SEEK_SET);
+    ///remplissage de la section texte
     while (!feof(program))
     {
         res = fscanf(program, "%X\n", &tempVal);
@@ -58,12 +59,12 @@ void freeProc(Mips *processor)
     Register *current = processor->memory;
     Register *prec;
     if (processor->text != NULL)
-        free(processor->text);
+        free(processor->text); /// liberation du programme 
     while (current->next != NULL)
     {
         prec = current;
         current = current->next;
-        free(prec);
+        free(prec); /// liberation des registre 
     }
     if (current != NULL)
         free(current);
@@ -73,7 +74,7 @@ Register *getregister(Mips *processor, int registerID)
     Register *reg = processor->memory;
     while ((reg = reg->next) != NULL && reg->registerID != registerID)
         ;
-    return reg;
+    return reg; /// dans le cas où aucun registre est trouvé renvoie NULL
 }
 
 void addRegister(Mips *processor, int registerID, int value)
@@ -86,16 +87,17 @@ void addRegister(Mips *processor, int registerID, int value)
         reg = reg->next;
     }
     reg->next = new;
-
+    /// ajout d'un registre en dernière position
     new->registerID = registerID;
     new->next = NULL;
-    new->value = value;
+    new->value = value; 
+
 }
 void executeProgramm(int pas, Mips *processor)
 {
     while (processor->PC != (processor->programSize << 2))
     {
-        executeInstruction((processor->text)[(processor->PC) >> 2], processor);
+        executeInstruction((processor->text)[(processor->PC) >> 2], processor); 
 
         if (pas)
         {
@@ -123,13 +125,13 @@ void executeInteractiv(Mips *processor)
     {
         line = NULL;
         fprintf(stdout, "enter instuction : \n");
-        getline(&line, &len, stdin);
+        getline(&line, &len, stdin); /// récupère la ligne rentré par l'utilisateur 
 
-        if (!strncmp(line, "EXIT", 4))
+        if (!strncmp(line, "EXIT", 4)) /// compare les 4 premier caractère
             flagStop = 1;
         else
         {
-            instruction = parseExpressionStr(line, &flagErr,0);
+            instruction = parseExpressionStr(line, &flagErr,0); /// parse l'expression rentré et l'exécute si elle est correcte  qu'il n'y a pas d'erreur
             switch (flagErr)
             {
             case instrERR_parsed:
@@ -160,7 +162,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
     int rs = 0, rd = 0, rt = 0, sa = 0;
 
     short int offset = 0;
-
+    /// décodage des différentes partie de l'intruction en hexadécimal 
     if (instruction != 0)
     {
         if (!(instruction & IINTRCODE))
@@ -169,7 +171,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
             getRD(instruction, rd);
             getRT(instruction, rt);
             getCode(instruction, offset);
-            switch (instruction & INTRCODE)
+            switch (instruction & INTRCODE) //regarde si on est de type R    
             {
             case ADD:
                 add(rd, rt, rs, processor);
@@ -279,7 +281,7 @@ void executeInstruction(unsigned int instruction, Mips *processor)
         nop(processor);
     }
 
-    processor->registres[0] = 0;
+    processor->registres[0] = 0; // permet d'être sûr que la valeur dans le registre 0 reste 0;
 }
 
 

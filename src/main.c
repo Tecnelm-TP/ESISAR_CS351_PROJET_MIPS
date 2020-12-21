@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
         {
 
             dest = strdup(src);
-            char *temp = strrchr(dest, '.');
+            char *temp = strrchr(dest, '.'); /// dans le cas ou la sortie n'est pas spécifié, on copie l'entréd et change l'extension ce qui donnera la sortie 
             if (temp == NULL)
             {
                 fprintf(stderr, "ERROR FOLDER SPECIFIED\n");
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
         }
         
 
-        if (!folderIsHEX)
+        if (!folderIsHEX) /// dans le cas ou le fichier d'entrée est spécifier comme étant en hexa on ne reparse pas le fichier 
         {
             initInstruction(instrL);
             parseFolder(src, dest);
