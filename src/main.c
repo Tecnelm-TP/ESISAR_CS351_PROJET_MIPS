@@ -84,6 +84,8 @@ int main(int argc, char *argv[])
         {
             free(dest);
         }
+        freeProc(&proc);
+
     }
     else
     {
@@ -94,9 +96,10 @@ int main(int argc, char *argv[])
         else
         {
             executeInteractiv(&proc);
+            freeProc(&proc);
+
         }
     }
-    freeProc(&proc);
 
     return 0;
 }

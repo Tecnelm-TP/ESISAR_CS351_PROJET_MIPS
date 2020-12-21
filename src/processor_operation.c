@@ -175,16 +175,18 @@ void lui(int rt, short int offset, Mips *processor)
 void sw(int rt, short int offset, int base, Mips *processor)
 {
 
-        Register *reg = getregister(processor, processor->registres[base]*4 + (offset)*4);
-        if (reg == NULL)
+        if ((offset + processor->registres[base])% 4 == 0)
         {
-            addRegister(processor, processor->registres[base]*4 + (offset)*4, processor->registres[rt]);
+            Register *reg = getregister(processor, processor->registres[base] + (offset));
+            if (reg == NULL)
+            {
+                addRegister(processor, processor->registres[base] + (offset), processor->registres[rt]);
+            }
+            else
+            {
+                reg->value = processor->registres[rt];
+            }
         }
-        else
-        {
-            reg->value = processor->registres[rt];
-        }
-
     processor->PC += 4;
 
     fprintf(stdout, "{SW $%d,0x%X($%d)}\n", rt, offset, base);
@@ -193,17 +195,21 @@ void lw(int rt, short int offset, int base, Mips *processor)
 {
 
 
-        Register *reg = getregister(processor, (processor->registres[base]*4 + (offset)*4));
-        if (reg == NULL)
+        if ((offset + processor->registres[base])% 4 == 0)
         {
-            addRegister(processor, processor->registres[base]*4 + (offset)*4, 0);
-            processor->registres[rt] = 0;
-        }
-        else
-        {
-            processor->registres[rt] = reg->value;
-        }
+            Register *reg = getregister(processor, (processor->registres[base] + (offset)));
+            if (reg == NULL)
+            {
+                addRegister(processor, processor->registres[base] + (offset), 0);
+                processor->registres[rt] = 0;
+            }
+            else
+            {
+                processor->registres[rt] = reg->value;
+            }
 
+        }
+        
     processor->PC += 4;
 
     fprintf(stdout, "{LW $%d,0x%X($%d)}\n", rt, offset, base);

@@ -30,7 +30,7 @@ void initialiseMips(Mips *processor, const char *programFolderName)
         fprintf(stderr, "ERROR OPEN PROGRAMM FOLDER\n");
         exit(1);
     }
-/// calcule de la taille de la section texte
+/// calcule de la taille de la section text
     while (!feof(program))
     {
         res = fscanf(program, "%X\n", &tempVal);
@@ -40,7 +40,7 @@ void initialiseMips(Mips *processor, const char *programFolderName)
 
     processor->text = malloc(processor->programSize * sizeof(unsigned int) / sizeof(char));
     fseek(program, 0, SEEK_SET);
-    ///remplissage de la section texte
+    ///remplissage de la section text
     while (!feof(program))
     {
         res = fscanf(program, "%X\n", &tempVal);
@@ -105,7 +105,7 @@ void executeProgramm(int pas, Mips *processor)
         }
     }
     fprintf(stdout, "-----------------------------------------------\n");
-    fprintf(stdout,"Fin du programs \n");
+    fprintf(stdout,"Fin du programme \n");
     step(processor);
 
 }
