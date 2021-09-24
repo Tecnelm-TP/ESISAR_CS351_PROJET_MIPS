@@ -1,0 +1,6 @@
+# SIMPLE TEST PROGRAM 2
+
+ADDI  $8,  $0,   4 # a = 4
+ADDI  $9,  $0,  10 # b = 10
+label:ADDI  $8,  $8,   1 # a++
+BNE   $8,  $9,  label # if (a != b), goto instruct précédente

@@ -1,0 +1,12 @@
+Bonjour,
+
+Ce code est le code de la review 1 de projet. Certaine fonction pas encore demandé ont été implementé mais ne sont pas encore totalement implementé et testé.
+Les codes assembleurs utilisé sont dans le dossier tests présent.
+Ils contiennent les codes que nous avons réalisé nous utilisons également les codes exemple mais nous ne les avons pas donnée dans le fichier tests. 
+
+Le code présenté n'est pas encore déffinitf et est amené à évolué en cas de bug découvert. 
+
+Certaine instruction ne sont pas implementé au vu de leur difficulté de leur représentation sans les labels, notament les intructions jump ;
+
+
+

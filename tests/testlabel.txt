@@ -1,0 +1,37 @@
+
+ADDI $8,$0,2
+ADDI $9,$0,10
+
+test:
+ADDI $8,$8,1
+NOP
+NOP
+
+BNE $8,$9,test # Backward jump
+ADDI $10, $0,1
+
+ADDI $11,$0,1
+BEQ $11,$10,next # forward jump
+ADDI $12,$0,5 # Should not be set
+NOP
+NOP
+
+next:
+ADDI $13,$13,2
+NOP
+BEQ $13,$9,jaltest
+J next
+
+jaltest:
+ADDI $14,$0,10
+JAL loop
+ADDI $16,$0,1
+J end
+
+loop:
+ADDI $15,$15,1
+BNE $14,$15, loop
+JR $31
+
+end:
+ADDI $17,$0,1
